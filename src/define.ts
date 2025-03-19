@@ -18,11 +18,11 @@ export function defineRouter<C extends (options: Required<TeeOptions<'router'>>)
 
 export interface TeeContext extends KoaRouter.RouterContext<Koa.DefaultState, TeeKoa.Context> {}
 
-export function defineController<C extends (options: TeeOptions<'controller'>) => new (options: TeeOptions<'controller'>) => any>(callback: C): C {
+export function defineController<C extends (options: TeeOptions<'controller'>) => new (...args: any) => any>(callback: C): C {
   return callback;
 }
 
-export function defineService<C extends (options: TeeOptions<'service'>) => new (options: TeeOptions<'service'>) => any>(callback: C): C {
+export function defineService<C extends (options: TeeOptions<'service'>) => new (...args: any) => any>(callback: C): C {
   return callback;
 }
 

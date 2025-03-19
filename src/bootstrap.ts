@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import KoaRouter from '@koa/router';
 import Koa from 'koa';
 import { resolve } from 'pathe';
-import { setStorage } from './storage';
+import { getStorage, setStorage } from './storage';
 import { loadModule, parseOptions } from './utils';
 
 export async function bootstrap(_options?: GenerateTypeOptions) {
@@ -21,7 +21,9 @@ export async function bootstrap(_options?: GenerateTypeOptions) {
 
   app.use(router.routes()).use(router.allowedMethods());
 
-  fs.writeFileSync(resolve(sourcePath, 'module.d.ts'), typeDeclarations, 'utf-8');
+  if (!getStorage('isProd')) {
+    fs.writeFileSync(resolve(sourcePath, 'module.d.ts'), typeDeclarations, 'utf-8');
+  }
 
   return { app, router };
 }
