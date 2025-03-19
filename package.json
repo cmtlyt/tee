@@ -1,6 +1,6 @@
 {
   "name": "@cmtlyt/tee",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "支持 ts 的仿 egg 后端框架",
   "exports": {
     ".": {
