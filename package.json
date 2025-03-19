@@ -1,0 +1,61 @@
+{
+  "name": "@cmtlyt/tee",
+  "version": "0.1.0",
+  "description": "支持 ts 的仿 egg 后端框架",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "bin": {
+    "tee": "bin/cli.mjs"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "type": "module",
+  "scripts": {
+    "dev": "unbuild --watch",
+    "build": "unbuild"
+  },
+  "keywords": ["tee", "egg", "koa", "ts", "backend"],
+  "author": {
+    "name": "cmtlyt",
+    "email": "cmtlyt@163.com"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@antfu/eslint-config": "^4.10.1",
+    "@types/koa": "^2.15.0",
+    "@types/koa__router": "^12.0.4",
+    "eslint": "^9.22.0",
+    "eslint-plugin-format": "^1.0.1",
+    "esno": "^4.8.0",
+    "typescript": "^5.8.2",
+    "unbuild": "^3.5.0"
+  },
+  "dependencies": {
+    "@cmtlyt/base": "^0.11.4",
+    "@koa/router": "^13.1.0",
+    "citty": "^0.1.6",
+    "defu": "^6.1.4",
+    "esbuild": "^0.25.1",
+    "fast-glob": "^3.3.3",
+    "jiti": "^2.4.2",
+    "koa": "^2.16.0",
+    "pathe": "^2.0.3",
+    "pkg-types": "^2.1.0",
+    "rimraf": "^6.0.1",
+    "scule": "^1.3.0"
+  }
+}

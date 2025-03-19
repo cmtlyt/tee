@@ -1,0 +1,27 @@
+{
+  "name": "example",
+  "version": "1.0.0",
+  "description": "",
+  "author": "",
+  "type": "module",
+  "license": "ISC",
+  "keywords": [],
+  "main": "index.js",
+  "scripts": {
+    "dev": "tee dev -w",
+    "build": "tee build",
+    "preview": "tee run"
+  },
+  "dependencies": {
+    "@cmtlyt/tee": "link:../tee-demo"
+  },
+  "devDependencies": {
+    "esno": "^4.8.0",
+    "typescript": "^5.8.2"
+  },
+  "pnpm": {
+    "overrides": {
+      "@cmtlyt/tee": "link:../tee-demo"
+    }
+  }
+}
