@@ -1,6 +1,6 @@
 {
   "name": "@cmtlyt/tee",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "支持 ts 的仿 egg 后端框架",
   "exports": {
     ".": {
@@ -11,6 +11,10 @@
   },
   "bin": {
     "tee": "bin/cli.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cmtlyt/tee.git"
   },
   "publishConfig": {
     "access": "public",
