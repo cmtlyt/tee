@@ -13,15 +13,10 @@
     "preview": "tee run"
   },
   "dependencies": {
-    "@cmtlyt/tee": "link:../tee-demo"
+    "@cmtlyt/tee": "^0.1.1"
   },
   "devDependencies": {
     "esno": "^4.8.0",
     "typescript": "^5.8.2"
-  },
-  "pnpm": {
-    "overrides": {
-      "@cmtlyt/tee": "link:../tee-demo"
-    }
   }
 }
