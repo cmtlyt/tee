@@ -1,0 +1,42 @@
+name: "💬 讨论"
+description: "开始关于框架的讨论"
+title: "[讨论]: 讨论标题"
+labels: [discussion]
+assignees: []
+body:
+  - type: dropdown
+    id: scope
+    attributes:
+      label: "讨论范围"
+      description: "这次讨论的范围是什么？"
+      options:
+        - 框架整体设计
+        - CLI 功能
+        - 构建流程
+        - 存储模块
+        - 工具函数
+        - 类型定义
+        - 启动流程
+        - 常量定义
+        - 项目文档
+        - 开发体验
+        - 其他（请说明）
+    validations:
+      required: true
+  - type: textarea
+    id: topic
+    attributes:
+      label: 讨论主题
+      description: "请提供一个清晰简洁的讨论主题。"
+    validations:
+      required: true
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 截图
+      description: "如果适用，添加截图以帮助解释您的主题。"
+  - type: textarea
+    id: links
+    attributes:
+      label: 链接
+      description: "包含任何可以为讨论提供更多上下文的相关链接。"
