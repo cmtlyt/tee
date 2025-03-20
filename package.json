@@ -2,6 +2,7 @@
   "name": "@cmtlyt/tee",
   "version": "0.1.2",
   "description": "支持 ts 的仿 egg 后端框架",
+  "packageManager": "pnpm@10.2.0",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
