@@ -1,13 +1,13 @@
-name: "🚀 功能请求"
-description: "我有一个建议 😻!"
-labels: ["feature"]
+name: 🚀 功能请求
+description: 我有一个建议 😻!
+labels: [feature]
 body:
   - type: textarea
     validations:
       required: true
     attributes:
-      label: "您的功能请求是否与某个问题有关？请描述"
-      description: "清晰简洁地描述问题是什么"
+      label: 您的功能请求是否与某个问题有关？请描述
+      description: 清晰简洁地描述问题是什么
       placeholder: |
         我有一个问题，当...
 
@@ -15,8 +15,8 @@ body:
     validations:
       required: true
     attributes:
-      label: "相关模块"
-      description: "此功能主要涉及项目中的哪个模块？"
+      label: 相关模块
+      description: 此功能主要涉及项目中的哪个模块？
       options:
         - CLI 功能
         - 构建流程
@@ -32,24 +32,24 @@ body:
     validations:
       required: true
     attributes:
-      label: "描述您想要的解决方案"
-      description: "清晰简洁地描述您希望发生的情况。添加任何考虑到的缺点"
+      label: 描述您想要的解决方案
+      description: 清晰简洁地描述您希望发生的情况。添加任何考虑到的缺点
 
   - type: textarea
     attributes:
-      label: "可教性、文档、采用、迁移策略"
-      description: "如果可以，解释用户将如何使用这个功能，并可能编写一个文档版本。也许可以提供截图或设计？"
+      label: 可教性、文档、采用、迁移策略
+      description: 如果可以，解释用户将如何使用这个功能，并可能编写一个文档版本。也许可以提供截图或设计？
 
   - type: textarea
     validations:
       required: true
     attributes:
-      label: "更改行为的动机/用例是什么？"
-      description: "描述动机或具体用例"
+      label: 更改行为的动机/用例是什么？
+      description: 描述动机或具体用例
 
   - type: checkboxes
     attributes:
-      label: "是否愿意实现此功能?"
-      description: "您是否愿意为此问题提供代码？"
+      label: 是否愿意实现此功能?
+      description: 您是否愿意为此问题提供代码？
       options:
-        - label: "我愿意提交PR实现这个功能"
+        - label: 我愿意提交PR实现这个功能

@@ -1,27 +1,27 @@
-name: "🐛 Bug 报告"
-description: "如果某些功能未按预期工作 🤔"
-labels: ["needs triage", "bug"]
+name: 🐛 Bug 报告
+description: 如果某些功能未按预期工作 🤔
+labels: [needs triage, bug]
 body:
   - type: textarea
     validations:
       required: true
     attributes:
-      label: "当前行为"
-      description: "问题是如何表现的？"
+      label: 当前行为
+      description: 问题是如何表现的？
 
   - type: input
     validations:
       required: false
     attributes:
-      label: "最小复现代码"
-      description: "请提供一个能够复现此问题的 Git 仓库或 Gist 的 URL。好的复现示例应该只包含必要的代码，方便我们快速定位问题。[了解什么是最小复现](https://jmcdo29.github.io/wtf-is-a-minimum-reproduction)"
-      placeholder: "https://github.com/username/repo | https://gist.github.com/username/gistid | https://stackblitz.com/edit/project"
+      label: 最小复现代码
+      description: '请提供一个能够复现此问题的 Git 仓库或 Gist 的 URL。好的复现示例应该只包含必要的代码，方便我们快速定位问题。[了解什么是最小复现](https://jmcdo29.github.io/wtf-is-a-minimum-reproduction)'
+      placeholder: 'https://github.com/username/repo | https://gist.github.com/username/gistid | https://stackblitz.com/edit/project'
 
   - type: textarea
-    validation:
+    validations:
       required: true
     attributes:
-      label: "复现步骤"
+      label: 复现步骤
       description: |
         问题是如何表现的？
         如果您已经在复现代码/仓库中写了这部分内容，可以留空
@@ -34,8 +34,8 @@ body:
     validations:
       required: true
     attributes:
-      label: "预期行为"
-      description: "清晰简洁地描述您期望发生的情况（或代码）"
+      label: 预期行为
+      description: 清晰简洁地描述您期望发生的情况（或代码）
 
   - type: markdown
     attributes:
@@ -46,8 +46,8 @@ body:
     validations:
       required: true
     attributes:
-      label: "受影响的模块"
-      description: "项目中的哪个模块受到影响？"
+      label: 受影响的模块
+      description: 项目中的哪个模块受到影响？
       options:
         - CLI 功能
         - 构建流程
@@ -62,21 +62,21 @@ body:
     validations:
       required: true
     attributes:
-      label: "框架版本"
+      label: 框架版本
       description: |
         您正在使用的框架版本是？
         **提示**：确保所有相关依赖项版本同步！
-      placeholder: "1.0.0"
+      placeholder: 1.0.0
 
   - type: input
     attributes:
-      label: "Node.js 版本"
-      description: "您使用的是哪个版本的 Node.js？"
-      placeholder: "14.17.6"
+      label: Node.js 版本
+      description: 您使用的是哪个版本的 Node.js？
+      placeholder: 14.17.6
 
   - type: checkboxes
     attributes:
-      label: "您在哪些操作系统上进行了测试？"
+      label: 您在哪些操作系统上进行了测试？
       options:
         - label: macOS
         - label: Windows
@@ -84,10 +84,10 @@ body:
 
   - type: checkboxes
     attributes:
-      label: "是否愿意修复?"
-      description: "您是否愿意为此问题提供修复代码？"
+      label: 是否愿意修复?
+      description: 您是否愿意为此问题提供修复代码？
       options:
-        - label: "我愿意提交PR实现这个功能"
+        - label: 我愿意提交PR实现这个功能
 
   - type: markdown
     attributes:
@@ -96,7 +96,7 @@ body:
 
   - type: textarea
     attributes:
-      label: "其他"
+      label: 其他
       description: |
         还有其他相关信息吗？例如：日志、操作系统版本、IDE、包管理器等。
         **提示：** 您可以通过点击此区域来高亮它，然后拖动文件到这里来附加图片、录像或日志文件
