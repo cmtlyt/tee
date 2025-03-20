@@ -1,0 +1,93 @@
+name: "🐛 Bug 报告"
+description: "如果某些功能未按预期工作 🤔"
+labels: ["needs triage", "bug"]
+body:
+  - type: textarea
+    validations:
+      required: true
+    attributes:
+      label: "当前行为"
+      description: "问题是如何表现的？"
+
+  - type: input
+    validations:
+      required: true
+    attributes:
+      label: "最小复现代码"
+      description: "一个能够复现此问题的 Git 仓库或 Gist 的 URL。[最小复现是什么？](https://jmcdo29.github.io/wtf-is-a-minimum-reproduction)"
+      placeholder: "https://github.com/..."
+
+  - type: textarea
+    attributes:
+      label: "复现步骤"
+      description: |
+        问题是如何表现的？
+        如果您已经在复现代码/仓库中写了这部分内容，可以留空
+      placeholder: |
+        1. `npm i`
+        2. `npm start:dev`
+        3. 看到错误...
+
+  - type: textarea
+    validations:
+      required: true
+    attributes:
+      label: "预期行为"
+      description: "清晰简洁地描述您期望发生的情况（或代码）"
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+
+  - type: dropdown
+    validations:
+      required: true
+    attributes:
+      label: "受影响的模块"
+      description: "项目中的哪个模块受到影响？"
+      options:
+        - CLI 功能
+        - 构建流程
+        - 存储模块
+        - 工具函数
+        - 类型定义
+        - 启动流程
+        - 常量定义
+        - 其他 (请在"其他"部分中说明)
+
+  - type: input
+    validations:
+      required: true
+    attributes:
+      label: "框架版本"
+      description: |
+        您正在使用的框架版本是？
+        **提示**：确保所有相关依赖项版本同步！
+      placeholder: "1.0.0"
+
+  - type: input
+    attributes:
+      label: "Node.js 版本"
+      description: "您使用的是哪个版本的 Node.js？"
+      placeholder: "14.17.6"
+
+  - type: checkboxes
+    attributes:
+      label: "您在哪些操作系统上进行了测试？"
+      options:
+        - label: macOS
+        - label: Windows
+        - label: Linux
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+
+  - type: textarea
+    attributes:
+      label: "其他"
+      description: |
+        还有其他相关信息吗？例如：日志、操作系统版本、IDE、包管理器等。
+        **提示：** 您可以通过点击此区域来高亮它，然后拖动文件到这里来附加图片、录像或日志文件
