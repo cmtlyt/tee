@@ -1,21 +1,21 @@
-name: "💥 回归问题"
-description: "报告在升级框架时出现的意外行为！"
-labels: ["needs triage"]
+name: 💥 回归问题
+description: 报告在升级框架时出现的意外行为！
+labels: [needs triage]
 body:
   - type: checkboxes
     attributes:
-      label: "是否已经存在提出此问题的 Issue？"
-      description: "请在[这里](./?q=is%3Aissue)搜索，查看是否已经存在您请求的功能的 Issue"
+      label: 是否已经存在提出此问题的 Issue？
+      description: '请在[这里](./?q=is%3Aissue)搜索，查看是否已经存在您请求的功能的 Issue'
       options:
-        - label: "我已经搜索了现有的 Issues"
+        - label: 我已经搜索了现有的 Issues
           required: true
 
   - type: dropdown
     validations:
       required: true
     attributes:
-      label: "受影响的模块"
-      description: "框架中的哪个模块受到回归问题的影响？"
+      label: 受影响的模块
+      description: 框架中的哪个模块受到回归问题的影响？
       options:
         - CLI 功能
         - 构建流程
@@ -28,26 +28,26 @@ body:
 
   - type: input
     attributes:
-      label: "可能引入回归的提交/PR"
-      description: "如果您有时间调查，哪个 PR/日期/版本引入了这个问题"
-      placeholder: "PR #123 或提交 5b3c4a4"
+      label: 可能引入回归的提交/PR
+      description: 如果您有时间调查，哪个 PR/日期/版本引入了这个问题
+      placeholder: 'PR #123 或提交 5b3c4a4'
 
   - type: input
     attributes:
-      label: "版本"
-      description: "您从哪个版本升级到哪个版本"
-      placeholder: "1.0.0 -> 1.1.0"
+      label: 版本
+      description: 您从哪个版本升级到哪个版本
+      placeholder: 1.0.0 -> 1.1.0
 
   - type: textarea
     validations:
       required: true
     attributes:
-      label: "描述回归问题"
-      description: "清晰简洁地描述回归问题是什么"
+      label: 描述回归问题
+      description: 清晰简洁地描述回归问题是什么
 
   - type: textarea
     attributes:
-      label: "最小复现代码"
+      label: 最小复现代码
       description: |
         请分享一个 git 仓库、gist 或逐步说明。[最小复现是什么？](https://jmcdo29.github.io/wtf-is-a-minimum-reproduction)
         **提示：** 如果您提供最小复现仓库，我们将更快理解您的问题！
@@ -60,13 +60,12 @@ body:
     validations:
       required: true
     attributes:
-      label: "预期行为"
-      description: "清晰简洁地描述您期望发生的情况（或代码）"
+      label: 预期行为
+      description: 清晰简洁地描述您期望发生的情况（或代码）
 
   - type: textarea
     attributes:
-      label: "其他"
+      label: 其他
       description: |
         还有其他相关信息吗？例如：日志、操作系统版本、IDE、包管理器等。
         **提示：** 您可以通过点击此区域来高亮它，然后拖动文件到这里来附加图片、录像或日志文件
-
