@@ -11,13 +11,15 @@ body:
 
   - type: input
     validations:
-      required: true
+      required: false
     attributes:
       label: "最小复现代码"
-      description: "一个能够复现此问题的 Git 仓库或 Gist 的 URL。[最小复现是什么？](https://jmcdo29.github.io/wtf-is-a-minimum-reproduction)"
-      placeholder: "https://github.com/..."
+      description: "请提供一个能够复现此问题的 Git 仓库或 Gist 的 URL。好的复现示例应该只包含必要的代码，方便我们快速定位问题。[了解什么是最小复现](https://jmcdo29.github.io/wtf-is-a-minimum-reproduction)"
+      placeholder: "https://github.com/username/repo | https://gist.github.com/username/gistid | https://stackblitz.com/edit/project"
 
   - type: textarea
+    validation:
+      required: true
     attributes:
       label: "复现步骤"
       description: |
@@ -79,6 +81,13 @@ body:
         - label: macOS
         - label: Windows
         - label: Linux
+
+  - type: checkboxes
+    attributes:
+      label: "是否愿意修复?"
+      description: "您是否愿意为此问题提供修复代码？"
+      options:
+        - label: "我愿意提交PR实现这个功能"
 
   - type: markdown
     attributes:

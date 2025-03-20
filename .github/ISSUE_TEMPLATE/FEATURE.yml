@@ -46,3 +46,10 @@ body:
     attributes:
       label: "更改行为的动机/用例是什么？"
       description: "描述动机或具体用例"
+
+  - type: checkboxes
+    attributes:
+      label: "是否愿意实现此功能?"
+      description: "您是否愿意为此问题提供代码？"
+      options:
+        - label: "我愿意提交PR实现这个功能"
