@@ -1,6 +1,6 @@
-import { defineConfig } from "@cmtlyt/tee";
+import { defineTeeConfig } from "@cmtlyt/tee";
 
-export default defineConfig({
+export default defineTeeConfig({
   build: {
     clean: true,
   },
