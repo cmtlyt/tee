@@ -33,7 +33,7 @@
     "dev": "unbuild --watch",
     "build": "unbuild",
     "prepare": "husky",
-    "lint": "eslint ."
+    "lint": "eslint src"
   },
   "keywords": [
     "tee",
