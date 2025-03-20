@@ -1,0 +1,61 @@
+name: Check and build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: ['*']  # 触发所有目标分支的 PR
+
+jobs:
+  check-and-build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node_version: [lts/*]
+        include:
+          - os: macos-latest
+            node_version: lts/*
+          - os: windows-latest
+            node_version: lts/*
+      fail-fast: false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set node ${{ matrix.node_version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node_version }}
+          cache: pnpm
+  
+      - name: Cache pnpm dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.pnpm-store
+            node_modules
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Install dependencies
+        run: pnpm install
+        env:
+          CI: true 
+          PNPM_HOME: ${{ runner.tool_CACHE }}/pnpm/8.8.0 
+
+      - name: Lint code
+        run: pnpm run lint || exit 1
+        continue-on-error: false 
+
+      - name: Run build
+        run: pnpm run build
+        continue-on-error: false
