@@ -11,7 +11,7 @@ export async function parseConfig() {
     return getStorage('config');
   const { pkgPath } = await getPkgInfo();
   const configPath = resolve(pkgPath, 'tee.config.ts');
-  const config: ConfigFile = await jitiImport(configPath).then(mod => mod.default, () => ({}));
+  const config: ConfigFile = await jitiImport(configPath, true).then(mod => mod.default, () => ({}));
   const finishedConfig = defu(config, {
     port: 3000,
     sourceDir: resolve(pkgPath, 'src'),

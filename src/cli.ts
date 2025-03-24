@@ -1,3 +1,4 @@
+import type { DevOptions } from './types';
 import fs from 'node:fs';
 import { defineCommand, runMain } from 'citty';
 import { resolve } from 'pathe';
@@ -5,14 +6,8 @@ import { version } from '../package.json';
 import { bootstrap } from './bootstrap';
 import { build as buildApp } from './build';
 import { runProd } from './run-prod';
-import { getStorage, getStorages, setStorage } from './storage';
-import { getPkgInfo, jitiImport, parseConfig } from './utils';
-
-interface DevOptions {
-  pkgPath: string;
-  sourceDir: string;
-  port: number;
-}
+import { getStorage, setStorage } from './storage';
+import { getPkgInfo, parseConfig } from './utils';
 
 function debounce<F extends (...args: any[]) => any>(fn: F, delay = 200) {
   let timer: NodeJS.Timeout;
@@ -20,11 +15,6 @@ function debounce<F extends (...args: any[]) => any>(fn: F, delay = 200) {
     clearTimeout(timer);
     timer = setTimeout(() => fn(...args), delay);
   }) as F;
-}
-
-async function runSourceMain({ pkgPath }: DevOptions) {
-  const { app, router } = getStorages(['app', 'router']);
-  return jitiImport(resolve(pkgPath, 'main.ts')).then(({ default: main }) => main(app, router), () => {});
 }
 
 function errorHandler(e: Error) {
@@ -37,11 +27,10 @@ async function restart(options: DevOptions) {
     oldServer.closeAllConnections();
     oldServer.close();
     const { app, router } = await bootstrap();
-    await runSourceMain(options);
     setStorage('server', app.listen(options.port));
     return { app, router };
   }
-  catch (e) {
+  catch (e: any) {
     errorHandler(e);
     return {};
   }
@@ -71,9 +60,9 @@ const dev = defineCommand({
   async run() {
     const { port, sourceDir } = await parseConfig();
     const { pkgPath } = await getPkgInfo();
+    const devOptions = { pkgPath, sourceDir, port, isCli: true };
+    setStorage('devOptions', devOptions);
     const { app } = await bootstrap();
-    const devOptions = { pkgPath, sourceDir, port };
-    await runSourceMain(devOptions);
     await devHandler(devOptions);
     setStorage('server', app.listen(port));
   },

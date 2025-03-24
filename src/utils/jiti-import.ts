@@ -14,8 +14,8 @@ export async function getJiti() {
   return jiti;
 }
 
-export async function jitiImport(id: string) {
-  if (getStorage('isProd'))
+export async function jitiImport(id: string, useJiti = false) {
+  if (!useJiti && getStorage('isProd'))
     return import(id);
   const jiti = await getJiti();
   return jiti.import<any>(id);

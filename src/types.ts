@@ -32,6 +32,7 @@ export interface GenerateTypeOptions {
   loadModuleOptions?: Partial<Record<ModuleType, LoadModuleOptions>>;
   loadModuleOrder?: (ModuleType | string)[];
   hooks?: {
+    onModulesLoadBefore?: (type: string, modules: FileInfo[]) => any;
     onModuleLoaded?: (moduleInfo: FileInfo) => any;
     onModulesLoaded?: (type: string, modules: FileInfo[]) => any;
   };
@@ -57,4 +58,12 @@ export interface Storage {
   jiti: Jiti;
   server: Server;
   isProd: boolean;
+  devOptions: DevOptions;
+}
+
+export interface DevOptions {
+  pkgPath: string;
+  sourceDir: string;
+  port: number;
+  isCli: boolean;
 }

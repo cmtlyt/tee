@@ -4,7 +4,7 @@ import KoaRouter from '@koa/router';
 import Koa from 'koa';
 import { resolve } from 'pathe';
 import { getStorage, setStorage } from './storage';
-import { loadModule, parseOptions } from './utils';
+import { loadModule, parseOptions, runSourceMain } from './utils';
 
 export async function bootstrap(_options?: GenerateTypeOptions) {
   const options = await parseOptions(_options);
@@ -18,6 +18,11 @@ export async function bootstrap(_options?: GenerateTypeOptions) {
   const { typeDeclarations, sourcePath } = await loadModule(app, router, options);
 
   app.middlewares ||= {};
+
+  const devOptions = getStorage('devOptions');
+  if (devOptions?.isCli) {
+    await runSourceMain(devOptions);
+  }
 
   app.use(router.routes()).use(router.allowedMethods());
 
