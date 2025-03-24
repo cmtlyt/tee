@@ -28,7 +28,7 @@ export function getModuleLoaded(app: TeeKoa.Application) {
       case 'middlewares':{
         const target = app.middlewares ||= {};
         // 扁平对象
-        return Object.assign(target, module);
+        return Object.assign(target, { [name]: module });
       }
       default:
     _type satisfies never;
@@ -72,7 +72,7 @@ function getModuleHandler(loadModuleOptions: GenerateTypeOptions['loadModuleOpti
 
 export async function baseLoadModule(options: GenerateTypeOptions) {
   const { loadModuleOptions, loadModuleOrder = MODULE_LOAD_ORDER, hooks = {} } = options;
-  const { onModuleLoaded = () => {}, onModulesLoaded = () => {} } = hooks;
+  const { onModuleLoaded = () => {}, onModulesLoaded = () => {}, onModulesLoadBefore = () => {} } = hooks;
   const { fileInfoMap, ...other } = await getFileInfoMapAndTypeDeclarations(options);
 
   const moduleHandler = getModuleHandler(loadModuleOptions || {} as Record<string, any>);
@@ -81,6 +81,7 @@ export async function baseLoadModule(options: GenerateTypeOptions) {
     const items = fileInfoMap[type];
     if (!items)
       continue;
+    await onModulesLoadBefore(type, items);
     for (const item of items) {
       const result = await moduleHandler(item.type, (await jitiImport(item.path)).default);
       await onModuleLoaded({ ...item, module: result });
@@ -93,6 +94,7 @@ export async function baseLoadModule(options: GenerateTypeOptions) {
 
   for (const type of Object.keys(fileInfoMap).filter(type => !NEED_RETURN_TYPES.includes(type))) {
     const items = fileInfoMap[type as ModuleType];
+    await onModulesLoadBefore(type, items);
     for (const item of items) {
       const result = await moduleHandler(item.type, (await jitiImport(item.path)).default);
       await onModuleLoaded({ ...item, module: result });
