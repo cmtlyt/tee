@@ -1,5 +1,5 @@
 import type KoaRouter from '@koa/router';
-import type { FileInfo, GenerateTypeOptions, ModuleType, TeeKoa } from '../types';
+import type { DeepRequired, FileInfo, GenerateTypeOptions, ModuleType, TeeKoa } from '../types';
 import { assoc, configMerge, parseConfig } from '.';
 import { MODULE_LOAD_ORDER, NEED_RETURN_TYPES } from '../constant';
 import { getStorage, getStorages } from '../storage';
@@ -8,9 +8,9 @@ import { jitiImport } from './jiti-import';
 
 export function getModuleLoaded(app: TeeKoa.Application, router: KoaRouter) {
   const { moduleHook } = getStorage('config');
-  const { loaded } = moduleHook as Required<typeof moduleHook>;
+  const { loaded } = moduleHook;
 
-  return async (moduleInfo: Required<FileInfo>) => {
+  return async (moduleInfo: DeepRequired<FileInfo>) => {
     const { type: _type, module, nameSep, name } = moduleInfo;
     switch (_type) {
       case 'router':
@@ -47,7 +47,7 @@ export function getModuleLoaded(app: TeeKoa.Application, router: KoaRouter) {
 
 function getModuleHandler(loadModuleOptions: GenerateTypeOptions['loadModuleOptions']) {
   const { app, router, config: { moduleHook } } = getStorages(['app', 'router', 'config']);
-  const { parser: otherModParser } = moduleHook as Required<typeof moduleHook>;
+  const { parser: otherModParser } = moduleHook;
 
   return async (_type: ModuleType, mod: any) => {
     const { parser, ...options } = loadModuleOptions?.[_type] || {};
