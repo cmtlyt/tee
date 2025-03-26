@@ -15,7 +15,12 @@ export async function parseConfig() {
   const finishedConfig = defu(config, {
     port: 3000,
     sourceDir: resolve(pkgPath, 'src'),
+    ignoreModules: [] as string[],
     loadModuleOrder: MODULE_LOAD_ORDER,
+    moduleHook: {
+      loaded: () => false,
+      parser: () => undefined,
+    },
     build: {
       outDir: resolve(pkgPath, 'dist'),
       clean: false,

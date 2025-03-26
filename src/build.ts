@@ -16,7 +16,7 @@ async function parseOptions(options?: BuildOptions) {
   return defu(options || {}, {
     sourceDir,
     ...rest,
-    outDir,
+    outDir: outDir!,
   });
 }
 

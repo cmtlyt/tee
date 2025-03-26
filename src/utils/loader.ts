@@ -1,12 +1,16 @@
 import type KoaRouter from '@koa/router';
 import type { FileInfo, GenerateTypeOptions, ModuleType, TeeKoa } from '../types';
-import { assoc, configMerge } from '.';
+import { assoc, configMerge, parseConfig } from '.';
 import { MODULE_LOAD_ORDER, NEED_RETURN_TYPES } from '../constant';
+import { getStorage, getStorages } from '../storage';
 import { getFileInfoMapAndTypeDeclarations } from './get-info';
 import { jitiImport } from './jiti-import';
 
-export function getModuleLoaded(app: TeeKoa.Application) {
-  return (moduleInfo: FileInfo) => {
+export function getModuleLoaded(app: TeeKoa.Application, router: KoaRouter) {
+  const { moduleHook } = getStorage('config');
+  const { loaded } = moduleHook as Required<typeof moduleHook>;
+
+  return async (moduleInfo: Required<FileInfo>) => {
     const { type: _type, module, nameSep, name } = moduleInfo;
     switch (_type) {
       case 'router':
@@ -30,18 +34,28 @@ export function getModuleLoaded(app: TeeKoa.Application) {
         // 扁平对象
         return Object.assign(target, { [name]: module });
       }
-      default:
-    _type satisfies never;
+      default:{
+        const result = await loaded({ app, router, moduleInfo });
+        if (result)
+          return;
+        _type satisfies never;
         console.warn('unknown type:', _type);
+      }
     }
   };
 }
 
 function getModuleHandler(loadModuleOptions: GenerateTypeOptions['loadModuleOptions']) {
+  const { app, router, config: { moduleHook } } = getStorages(['app', 'router', 'config']);
+  const { parser: otherModParser } = moduleHook as Required<typeof moduleHook>;
+
   return async (_type: ModuleType, mod: any) => {
     const { parser, ...options } = loadModuleOptions?.[_type] || {};
-    if (parser)
-      return parser(mod, options);
+    if (parser) {
+      const result = parser(mod, options);
+      if (typeof result !== 'undefined')
+        return result;
+    }
     switch (_type) {
       case 'controller':
       case 'service':{
@@ -64,8 +78,12 @@ function getModuleHandler(loadModuleOptions: GenerateTypeOptions['loadModuleOpti
       case 'routerSchema':{
         return mod;
       }
-      default:
+      default: {
+        const result = await otherModParser({ type: _type, mod, app, router });
+        if (typeof result !== 'undefined')
+          return result;
         _type satisfies never;
+      }
     }
   };
 }
@@ -74,6 +92,7 @@ export async function baseLoadModule(options: GenerateTypeOptions) {
   const { loadModuleOptions, loadModuleOrder = MODULE_LOAD_ORDER, hooks = {} } = options;
   const { onModuleLoaded = () => {}, onModulesLoaded = () => {}, onModulesLoadBefore = () => {} } = hooks;
   const { fileInfoMap, ...other } = await getFileInfoMapAndTypeDeclarations(options);
+  const { ignoreModules } = await parseConfig();
 
   const moduleHandler = getModuleHandler(loadModuleOptions || {} as Record<string, any>);
 
@@ -92,7 +111,9 @@ export async function baseLoadModule(options: GenerateTypeOptions) {
     await onModulesLoaded(type, items);
   }
 
-  for (const type of Object.keys(fileInfoMap).filter(type => !NEED_RETURN_TYPES.includes(type))) {
+  for (const type of Object.keys(fileInfoMap).filter(type =>
+    !NEED_RETURN_TYPES.includes(type) && !ignoreModules.includes(type),
+  )) {
     const items = fileInfoMap[type as ModuleType];
     await onModulesLoadBefore(type, items);
     for (const item of items) {
@@ -130,7 +151,7 @@ export async function loadModule(app: TeeKoa.Application, router: KoaRouter, opt
           delete app.config;
         }
       },
-      onModuleLoaded: getModuleLoaded(app),
+      onModuleLoaded: getModuleLoaded(app, router),
     },
     ...(options || {}),
   });
