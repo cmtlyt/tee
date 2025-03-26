@@ -1,6 +1,7 @@
 import type { FileInfo, TeeKoa } from '../types';
 import process from 'node:process';
 import defu from 'defu';
+import { consola } from './consola';
 import { getItemType } from './generate-type';
 
 export function getEnv(app: TeeKoa.Application) {
@@ -31,7 +32,7 @@ export function configMerge(app: TeeKoa.Application, configs: FileInfo[]) {
         result.production = { relativePath, config: module };
     }
     catch (e) {
-      console.error(item);
+      consola.error(e, item);
       throw e;
     }
     return result;

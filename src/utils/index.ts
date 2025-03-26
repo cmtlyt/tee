@@ -4,10 +4,10 @@ import { getStorages } from '../storage';
 import { jitiImport } from './jiti-import';
 
 export * from './config';
+export * from './consola';
 export * from './get-info';
 export * from './jiti-import';
 export * from './loader';
-export * from './parse';
 export * from './parse';
 
 export function assoc(path: string[], value: any, source: Record<string, any>) {

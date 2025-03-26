@@ -7,7 +7,7 @@ import { bootstrap } from './bootstrap';
 import { build as buildApp } from './build';
 import { runProd } from './run-prod';
 import { getStorage, setStorage } from './storage';
-import { getPkgInfo, parseConfig } from './utils';
+import { consola, getPkgInfo, parseConfig } from './utils';
 
 function debounce<F extends (...args: any[]) => any>(fn: F, delay = 200) {
   let timer: NodeJS.Timeout;
@@ -18,7 +18,7 @@ function debounce<F extends (...args: any[]) => any>(fn: F, delay = 200) {
 }
 
 function errorHandler(e: Error) {
-  console.error(e);
+  consola.error(e);
 }
 
 async function restart(options: DevOptions) {
@@ -37,9 +37,9 @@ async function restart(options: DevOptions) {
 }
 
 const watchHandler = debounce(async (options: DevOptions) => {
-  console.warn('Watching for changes...');
+  consola.start('Watching for changes...');
   await restart(options);
-  console.warn('Restarted');
+  consola.success('Restarted');
 });
 
 async function devHandler(options: DevOptions) {
@@ -65,6 +65,7 @@ const dev = defineCommand({
     const { app } = await bootstrap();
     await devHandler(devOptions);
     setStorage('server', app.listen(port));
+    consola.box('live server', `http://localhost:${port}`);
   },
 });
 

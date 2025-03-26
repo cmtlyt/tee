@@ -1,6 +1,6 @@
 import type KoaRouter from '@koa/router';
 import type { DeepRequired, FileInfo, GenerateTypeOptions, ModuleType, TeeKoa } from '../types';
-import { assoc, configMerge, parseConfig } from '.';
+import { assoc, configMerge, consola, parseConfig } from '.';
 import { MODULE_LOAD_ORDER, NEED_RETURN_TYPES } from '../constant';
 import { getStorage, getStorages } from '../storage';
 import { getFileInfoMapAndTypeDeclarations } from './get-info';
@@ -39,7 +39,7 @@ export function getModuleLoaded(app: TeeKoa.Application, router: KoaRouter) {
         if (result)
           return;
         _type satisfies never;
-        console.warn('unknown type:', _type);
+        consola.warn('unknown type:', _type);
       }
     }
   };
@@ -109,6 +109,7 @@ export async function baseLoadModule(options: GenerateTypeOptions) {
       item.module = result;
     }
     await onModulesLoaded(type, items);
+    consola.success(`${type} module load done`);
   }
 
   for (const type of Object.keys(fileInfoMap).filter(type =>
@@ -124,6 +125,7 @@ export async function baseLoadModule(options: GenerateTypeOptions) {
       item.module = result;
     }
     await onModulesLoaded(type, items);
+    consola.success(`${type} module load done`);
   }
 
   return { ...other, fileInfoMap };
