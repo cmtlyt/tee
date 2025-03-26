@@ -1,3 +1,12 @@
+## [0.2.1](https://github.com/cmtlyt/tee/compare/v0.2.0...v0.2.1) (2025-03-26)
+
+
+### Bug Fixes
+
+* 补充运行环境注释 ([#11](https://github.com/cmtlyt/tee/issues/11)) ([6d8b2be](https://github.com/cmtlyt/tee/commit/6d8b2bed00a07768ae0669b8fc07c54fa91cc91e))
+
+
+
 # [0.2.0](https://github.com/cmtlyt/tee/compare/4b6e38b65097c2c84e3f85f8286902e525fe7a4d...v0.2.0) (2025-03-26)
 
 
