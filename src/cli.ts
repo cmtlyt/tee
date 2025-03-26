@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import type { DevOptions } from './types';
 import fs from 'node:fs';
 import { defineCommand, runMain } from 'citty';
