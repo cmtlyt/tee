@@ -4,7 +4,17 @@ import type { ConfigFile, TeeKoa } from './types';
 
 export type TeeOptions<T extends string> = TeeKoa.SetupOptionMap[T];
 
-export function defineMiddleware<C extends (options: TeeOptions<'middleware'>) => TeeKoa.Middleware>(callback: C): C {
+interface DefineMiddlewareOptions {
+  needWrap?: boolean;
+}
+
+interface DefineMiddlewareNeedWrapOptions extends DefineMiddlewareOptions {
+  needWrap: true;
+}
+
+export function defineMiddleware<C extends (options: TeeOptions<'middleware'>) => (...args: any[]) => TeeKoa.Middleware>(callback: C, options: DefineMiddlewareNeedWrapOptions): C;
+export function defineMiddleware<C extends (options: TeeOptions<'middleware'>) => TeeKoa.Middleware>(callback: C): C;
+export function defineMiddleware<C extends (options: TeeOptions<'middleware'>) => (...args: any[]) => any>(callback: C, _options?: DefineMiddlewareOptions): C {
   return callback;
 }
 

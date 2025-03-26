@@ -2,11 +2,12 @@ import type { FileInfo, FileInfoMap, ModuleType } from '../types';
 import { readPackageJSON } from 'pkg-types';
 import { pascalCase } from 'scule';
 import { NEED_READ_PROTOTYPE_TYPES, NEED_RETURN_TYPES } from '../constant';
+import { getStorage } from '../storage';
 
-export function getItemType(item: Pick<FileInfo, 'type' | 'relativePath'>) {
+export function getItemType(item: Pick<FileInfo, 'type' | 'relativePath'>, extendsNeedReturnTypes: string[] = []) {
   if (!item.relativePath)
     return '{}';
-  if (NEED_RETURN_TYPES.includes(item.type))
+  if (NEED_RETURN_TYPES.includes(item.type) || extendsNeedReturnTypes.includes(item.type))
     return `Awaited<ReturnType<typeof import('./${item.relativePath}')['default']>>${NEED_READ_PROTOTYPE_TYPES.includes(item.type) ? `['prototype']` : ''}`;
   return `typeof import('./${item.relativePath}')['default']${NEED_READ_PROTOTYPE_TYPES.includes(item.type) ? `['prototype']` : ''}`;
 }
@@ -16,13 +17,16 @@ interface TypeInfo {
 }
 
 function generateTypeInfo(fileInfoMap: FileInfoMap) {
+  const { generateTypeConfig: { customNeedReturnTypeModules }, ignoreModules } = getStorage('config');
   const typeInfo: TypeInfo = {};
   for (const type in fileInfoMap) {
+    if (ignoreModules.includes(type))
+      continue;
     const fileInfos = fileInfoMap[type as ModuleType];
     fileInfos.forEach((item) => {
       const { nameSep } = item;
       const target = [type, ...nameSep].slice(0, -1).reduce((tree, name) => tree[name] ||= {} as any, typeInfo);
-      target[nameSep.at(-1)!] = getItemType(item);
+      target[nameSep.at(-1)!] = getItemType(item, customNeedReturnTypeModules);
     });
   }
   return typeInfo;

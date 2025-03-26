@@ -5,7 +5,7 @@ import { getPkgInfo, parseConfig } from './utils';
 export async function runProd() {
   setStorage('isProd', true);
 
-  const { build = {}, port = 3000 } = await parseConfig();
+  const { build, port = 3000 } = await parseConfig();
 
   const sourceDir = build.outDir || 'dist';
 
