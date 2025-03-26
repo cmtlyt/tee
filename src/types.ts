@@ -67,6 +67,32 @@ export interface ModuleHandlerContext {
   router: KoaRouter;
 }
 
+export interface ModuleHook {
+  /**
+   * 模块加载完成钩子
+   *
+   * 用于将模块内容注入到上下文, 只有在内置模块无法处理时调用
+   *
+   * 返回 true 表示已处理, 返回 false 则表示未处理并跳出警告
+   */
+  loaded?: (ctx: ModuleLoadedContext) => boolean | Promise<boolean>;
+  /**
+   * 解析模块内容钩子
+   *
+   * 会读取到对应目录的内容, 然后通过该钩子传递
+   *
+   * 该钩子的返回值将作为模块最终透出的结果
+   */
+  parser?: (ctx: ModuleHandlerContext) => any | Promise<any>;
+}
+
+export interface GenerateTypeConfig {
+  /**
+   * 自定义需要返回值类型的模块
+   */
+  customNeedReturnTypeModules?: string[];
+}
+
 export interface ConfigFile {
   /**
    * 启动端口
@@ -91,28 +117,15 @@ export interface ConfigFile {
   /**
    * 模块钩子
    */
-  moduleHook?: {
-    /**
-     * 模块加载完成钩子
-     *
-     * 用于将模块内容注入到上下文, 只有在内置模块无法处理时调用
-     *
-     * 返回 true 表示已处理, 返回 false 则表示未处理并跳出警告
-     */
-    loaded?: (ctx: ModuleLoadedContext) => boolean | Promise<boolean>;
-    /**
-     * 解析模块内容钩子
-     *
-     * 会读取到对应目录的内容, 然后通过该钩子传递
-     *
-     * 该钩子的返回值将作为模块最终透出的结果
-     */
-    parser?: (ctx: ModuleHandlerContext) => any | Promise<any>;
-  };
+  moduleHook?: ModuleHook;
   /**
    * 构建配置
    */
   build?: BuildConfig;
+  /**
+   * 类型生成配置
+   */
+  generateTypeConfig?: GenerateTypeConfig;
 }
 
 export interface Storage {

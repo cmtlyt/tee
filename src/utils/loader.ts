@@ -1,7 +1,7 @@
 import type KoaRouter from '@koa/router';
 import type { DeepRequired, FileInfo, GenerateTypeOptions, ModuleType, TeeKoa } from '../types';
 import { assoc, configMerge, consola, parseConfig } from '.';
-import { MODULE_LOAD_ORDER, NEED_RETURN_TYPES } from '../constant';
+import { MODULE_LOAD_ORDER } from '../constant';
 import { getStorage, getStorages } from '../storage';
 import { getFileInfoMapAndTypeDeclarations } from './get-info';
 import { jitiImport } from './jiti-import';
@@ -96,37 +96,34 @@ export async function baseLoadModule(options: GenerateTypeOptions) {
 
   const moduleHandler = getModuleHandler(loadModuleOptions || {} as Record<string, any>);
 
+  const modulesLoadProcess = async (type: string, items: FileInfo[]) => {
+    await onModulesLoadBefore(type, items);
+    await Promise.all(items.map(async (item) => {
+      const result = await moduleHandler(item.type, (await jitiImport(item.path)).default);
+      await onModuleLoaded({ ...item, module: result });
+      if (!result)
+        return;
+      item.module = result;
+    }));
+    await onModulesLoaded(type, items);
+    consola.success(`${type} module load done`);
+  };
+
   for (const type of (loadModuleOrder as ModuleType[])) {
     const items = fileInfoMap[type];
     if (!items)
       continue;
-    await onModulesLoadBefore(type, items);
-    for (const item of items) {
-      const result = await moduleHandler(item.type, (await jitiImport(item.path)).default);
-      await onModuleLoaded({ ...item, module: result });
-      if (!result)
-        continue;
-      item.module = result;
-    }
-    await onModulesLoaded(type, items);
-    consola.success(`${type} module load done`);
+    await modulesLoadProcess(type, items);
   }
 
-  for (const type of Object.keys(fileInfoMap).filter(type =>
-    !NEED_RETURN_TYPES.includes(type) && !ignoreModules.includes(type),
-  )) {
+  await Promise.all(Object.keys(fileInfoMap).filter(type =>
+    !loadModuleOrder.includes(type) && !ignoreModules.includes(type),
+  ).map(async (type) => {
     const items = fileInfoMap[type as ModuleType];
-    await onModulesLoadBefore(type, items);
-    for (const item of items) {
-      const result = await moduleHandler(item.type, (await jitiImport(item.path)).default);
-      await onModuleLoaded({ ...item, module: result });
-      if (!result)
-        continue;
-      item.module = result;
-    }
-    await onModulesLoaded(type, items);
-    consola.success(`${type} module load done`);
-  }
+    if (!items)
+      return;
+    return modulesLoadProcess(type, items);
+  }));
 
   return { ...other, fileInfoMap };
 }

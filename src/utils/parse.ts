@@ -25,6 +25,9 @@ export async function parseConfig() {
       outDir: resolve(pkgPath, 'dist'),
       clean: false,
     },
+    generateTypeConfig: {
+      customNeedReturnTypeModules: [],
+    },
   });
   setStorage('config', finishedConfig);
   return finishedConfig;
