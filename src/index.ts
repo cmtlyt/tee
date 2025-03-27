@@ -7,6 +7,7 @@ export * from './build';
 export * from './constant';
 export * from './define';
 
+export type { TeeOptions } from './types';
 export { getEnv } from './utils';
 
 export type { Defu as MergeConfig } from 'defu';
