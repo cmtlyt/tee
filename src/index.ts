@@ -34,6 +34,10 @@ declare namespace TeeKoa {
       app: Application;
       router: KoaRouter;
     };
+    middleware: {
+      app: Application;
+      router: KoaRouter;
+    };
     [key: string]: {
       app: Application;
     };

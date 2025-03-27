@@ -4,12 +4,14 @@ import { pascalCase } from 'scule';
 import { NEED_READ_PROTOTYPE_TYPES, NEED_RETURN_TYPES } from '../constant';
 import { getStorage } from '../storage';
 
-export function getItemType(item: Pick<FileInfo, 'type' | 'relativePath'>, extendsNeedReturnTypes: string[] = []) {
-  if (!item.relativePath)
+export function getItemType(item: Pick<FileInfo, 'type' | 'relativePath' | 'path'>) {
+  const { generateTypeConfig: { customNeedReturnTypeModules, useAbsolutePath } } = getStorage('config');
+  const path = useAbsolutePath ? item.path : item.relativePath;
+  if (!path)
     return '{}';
-  if (NEED_RETURN_TYPES.includes(item.type) || extendsNeedReturnTypes.includes(item.type))
-    return `Awaited<ReturnType<typeof import('./${item.relativePath}')['default']>>${NEED_READ_PROTOTYPE_TYPES.includes(item.type) ? `['prototype']` : ''}`;
-  return `typeof import('./${item.relativePath}')['default']${NEED_READ_PROTOTYPE_TYPES.includes(item.type) ? `['prototype']` : ''}`;
+  if (NEED_RETURN_TYPES.includes(item.type) || customNeedReturnTypeModules.includes(item.type))
+    return `Awaited<ReturnType<typeof import('./${path}')['default']>>${NEED_READ_PROTOTYPE_TYPES.includes(item.type) ? `['prototype']` : ''}`;
+  return `typeof import('./${path}')['default']${NEED_READ_PROTOTYPE_TYPES.includes(item.type) ? `['prototype']` : ''}`;
 }
 
 interface TypeInfo {
@@ -17,7 +19,7 @@ interface TypeInfo {
 }
 
 function generateTypeInfo(fileInfoMap: FileInfoMap) {
-  const { generateTypeConfig: { customNeedReturnTypeModules }, ignoreModules } = getStorage('config');
+  const { ignoreModules } = getStorage('config');
   const typeInfo: TypeInfo = {};
   for (const type in fileInfoMap) {
     if (ignoreModules.includes(type))
@@ -26,7 +28,7 @@ function generateTypeInfo(fileInfoMap: FileInfoMap) {
     fileInfos.forEach((item) => {
       const { nameSep } = item;
       const target = [type, ...nameSep].slice(0, -1).reduce((tree, name) => tree[name] ||= {} as any, typeInfo);
-      target[nameSep.at(-1)!] = getItemType(item, customNeedReturnTypeModules);
+      target[nameSep.at(-1)!] = getItemType(item);
     });
   }
   return typeInfo;

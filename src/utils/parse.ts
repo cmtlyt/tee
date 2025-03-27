@@ -2,12 +2,12 @@ import type { ConfigFile, GenerateTypeOptions } from '../types';
 import { resolve } from 'pathe';
 import { defu } from '.';
 import { MODULE_LOAD_ORDER } from '../constant';
-import { getStorage, setStorage } from '../storage';
+import { getStorage, hasStorage, setStorage } from '../storage';
 import { getPkgInfo } from './get-info';
 import { jitiImport } from './jiti-import';
 
 export async function parseConfig() {
-  if (getStorage('config'))
+  if (hasStorage('config'))
     return getStorage('config');
   const { pkgPath } = await getPkgInfo();
   const configPath = resolve(pkgPath, 'tee.config.ts');
@@ -27,6 +27,7 @@ export async function parseConfig() {
     },
     generateTypeConfig: {
       customNeedReturnTypeModules: [],
+      useAbsolutePath: false,
     },
   });
   setStorage('config', finishedConfig);
@@ -34,7 +35,7 @@ export async function parseConfig() {
 }
 
 export async function parseOptions(options?: GenerateTypeOptions) {
-  if (getStorage('options'))
+  if (hasStorage('options'))
     return getStorage('options');
   const { sourceDir, loadModuleOrder } = await parseConfig();
   const finishedOptions = defu(options || {}, { sourceDir, loadModuleOrder });

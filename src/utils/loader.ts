@@ -1,5 +1,5 @@
-import type KoaRouter from '@koa/router';
 import type { DeepRequired, FileInfo, GenerateTypeOptions, ModuleType, TeeKoa } from '../types';
+import KoaRouter from '@koa/router';
 import { assoc, configMerge, consola, parseConfig } from '.';
 import { MODULE_LOAD_ORDER } from '../constant';
 import { getStorage, getStorages } from '../storage';
@@ -13,16 +13,18 @@ export function getModuleLoaded(app: TeeKoa.Application, router: KoaRouter) {
   return async (moduleInfo: DeepRequired<FileInfo>) => {
     const { type: _type, module, nameSep, name } = moduleInfo;
     switch (_type) {
-      case 'router':
-      // 不处理
+      case 'router':{
+        // 合并所有子路由到主路由中
+        router.use(module.routes(), module.allowedMethods());
         return;
+      }
       case 'config':
       case 'controller':
       case 'service':
-      // 树状对象
+        // 树状对象
         return assoc([_type, ...nameSep], module, app);
       case 'extend':
-      // 添加到上下文对象
+        // 添加到上下文对象
         return (app as any)[name] = module;
       case 'routerSchema':{
         const target = (app.context as any)[name] ||= {};
@@ -50,7 +52,8 @@ function getModuleHandler(loadModuleOptions: GenerateTypeOptions['loadModuleOpti
   const { parser: otherModParser } = moduleHook;
 
   return async (_type: ModuleType, mod: any) => {
-    const { parser, ...options } = loadModuleOptions?.[_type] || {};
+    const { parser, getOptions, ..._options } = loadModuleOptions?.[_type] || {};
+    const options = getOptions?.(_type, mod, _options) || _options;
     if (parser) {
       const result = parser(mod, options);
       if (typeof result !== 'undefined')
@@ -71,9 +74,12 @@ function getModuleHandler(loadModuleOptions: GenerateTypeOptions['loadModuleOpti
       }
       case 'config':
       case 'extend':
-      case 'middlewares':
-      case 'router':{
+      case 'middlewares':{
         return mod(options);
+      }
+      case 'router':{
+        await mod(options);
+        return options.router;
       }
       case 'routerSchema':{
         return mod;
@@ -135,8 +141,8 @@ export async function loadModule(app: TeeKoa.Application, router: KoaRouter, opt
       config: { app },
       controller: { app },
       extend: { app },
-      middlewares: { app },
-      router: { app, router },
+      middlewares: { app, router },
+      router: { getOptions: () => ({ app, router: new KoaRouter() }) },
       routerSchema: { app },
       service: { app },
     },

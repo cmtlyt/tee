@@ -42,8 +42,8 @@ export function configMerge(app: TeeKoa.Application, configs: FileInfo[]) {
 
   const envConfig = envConfigMap[env] || envConfigMap.production || { config: {} };
 
-  const defaultConfigType = getItemType({ relativePath: defaultConfig.relativePath, type: 'config' });
-  const envConfigType = getItemType({ relativePath: envConfig.relativePath, type: 'config' });
+  const defaultConfigType = getItemType({ path: defaultConfig.relativePath, relativePath: defaultConfig.relativePath, type: 'config' });
+  const envConfigType = getItemType({ path: envConfig.relativePath, relativePath: envConfig.relativePath, type: 'config' });
   const computedConfig = defu(envConfig.config, defaultConfig.config);
 
   const configTypeDeclarations = `interface IComputedConfig extends MergeConfig<${defaultConfigType}, [${envConfigType}]> {}`;

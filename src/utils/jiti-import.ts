@@ -1,10 +1,10 @@
 import { createJiti } from 'jiti';
 import { resolve } from 'pathe';
-import { getStorage, setStorage } from '../storage';
+import { getStorage, hasStorage, setStorage } from '../storage';
 import { getPkgInfo } from './get-info';
 
 export async function getJiti() {
-  if (getStorage('jiti'))
+  if (hasStorage('jiti'))
     return getStorage('jiti');
   const { pkgPath } = await getPkgInfo();
   const jiti = createJiti(resolve(pkgPath, 'main.ts'), {
@@ -15,7 +15,7 @@ export async function getJiti() {
 }
 
 export async function jitiImport(id: string, useJiti = false) {
-  if (!useJiti && getStorage('isProd'))
+  if (!useJiti && hasStorage('isProd') && getStorage('isProd'))
     return import(id);
   const jiti = await getJiti();
   return jiti.import<any>(id);
