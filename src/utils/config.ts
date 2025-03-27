@@ -1,6 +1,6 @@
 import type { FileInfo, TeeKoa } from '../types';
 import process from 'node:process';
-import defu from 'defu';
+import { defu } from '.';
 import { consola } from './consola';
 import { getItemType } from './generate-type';
 

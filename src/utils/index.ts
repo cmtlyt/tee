@@ -1,7 +1,16 @@
 import type { DevOptions } from '../types';
+import { createDefu } from 'defu';
 import { resolve } from 'pathe';
 import { getStorages } from '../storage';
 import { jitiImport } from './jiti-import';
+
+export const defu = createDefu((object, key, value) => {
+  const targetValue = object[key];
+  if (Array.isArray(targetValue) && Array.isArray(value)) {
+    object[key] = value;
+    return true;
+  }
+});
 
 export * from './config';
 export * from './consola';

@@ -1,6 +1,6 @@
 import type { ConfigFile, GenerateTypeOptions } from '../types';
-import defu from 'defu';
 import { resolve } from 'pathe';
+import { defu } from '.';
 import { MODULE_LOAD_ORDER } from '../constant';
 import { getStorage, setStorage } from '../storage';
 import { getPkgInfo } from './get-info';

@@ -111,7 +111,7 @@ export interface ConfigFile {
   ignoreModules?: string[];
   /**
    * 模块加载顺序
-   * @default ['config', 'extend', 'routerSchema', 'middlewares', 'controller', 'service', 'router']
+   * @default ['config', 'extend', 'routerSchema', 'service', 'middlewares', 'controller', 'router']
    */
   loadModuleOrder?: (ModuleType | string)[];
   /**
