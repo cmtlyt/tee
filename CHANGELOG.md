@@ -1,4 +1,9 @@
-# [0.3.0](https://github.com/cmtlyt/tee/compare/v0.2.2...v0.3.0) (2025-03-27)
+## [0.3.1](https://github.com/cmtlyt/tee/compare/v0.2.2...v0.3.1) (2025-03-27)
+
+
+### Bug Fixes
+
+* 对外暴露TeeOptions类型 ([302b130](https://github.com/cmtlyt/tee/commit/302b130312f175106cd93e40b0c61a2a403bc9f9))
 
 
 ### Features
