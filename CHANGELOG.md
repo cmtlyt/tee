@@ -1,3 +1,12 @@
+## [0.2.2](https://github.com/cmtlyt/tee/compare/v0.2.1...v0.2.2) (2025-03-27)
+
+
+### Bug Fixes
+
+* 修复模块加载顺序错误问题 ([#14](https://github.com/cmtlyt/tee/issues/14)) ([be909ec](https://github.com/cmtlyt/tee/commit/be909ece9d4b6971d7243c4efde4ee7b0dd0089b))
+
+
+
 ## [0.2.1](https://github.com/cmtlyt/tee/compare/v0.2.0...v0.2.1) (2025-03-26)
 
 
