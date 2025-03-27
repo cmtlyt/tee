@@ -1,6 +1,6 @@
 import { bootstrap } from './bootstrap';
 import { setStorage } from './storage';
-import { getPkgInfo, parseConfig } from './utils';
+import { consola, getPkgInfo, parseConfig } from './utils';
 
 export async function runProd() {
   setStorage('isProd', true);
@@ -15,5 +15,7 @@ export async function runProd() {
 
   const { app } = await bootstrap({ sourceDir });
 
-  app.listen(port);
+  app.listen(port, () => {
+    consola.box('live server', `http://localhost:${port}`);
+  });
 }

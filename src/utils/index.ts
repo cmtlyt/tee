@@ -26,7 +26,7 @@ export function assoc(path: string[], value: any, source: Record<string, any>) {
 }
 
 export async function runSourceMain({ pkgPath, sourceDir }: DevOptions) {
-  const { app, router, isProd } = getStorages(['app', 'router', 'isProd']);
+  const { app, router, isProd } = getStorages(['app', 'router', 'isProd'], { isProd: false });
   const sourceMainPath = resolve(pkgPath, isProd ? `${sourceDir}/main.js` : 'main.ts');
   return jitiImport(sourceMainPath).then(({ default: main }) => main(app, router), () => {});
 }

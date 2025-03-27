@@ -6,21 +6,49 @@ import type TeeKoa from '.';
 
 export { TeeKoa };
 
+/**
+ * 内置模块类型
+ */
 export type ModuleType = 'controller' | 'service' | 'middlewares' | 'router' | 'config' | 'extend' | 'routerSchema';
 
 export interface FileInfo {
+  /**
+   * 模块类型
+   */
   type: ModuleType;
+  /**
+   * 模块路径
+   */
   path: string;
+  /**
+   * 模块相对路径, 相对于源码目录
+   */
   relativePath: string;
+  /**
+   * 模块名称
+   */
   name: string;
+  /**
+   * 模块名称分隔
+   */
   nameSep: string[];
+  /**
+   * 模块内容
+   */
   module?: any;
 }
 
 export type FileInfoMap = Record<ModuleType, FileInfo[]>;
 
 export interface LoadModuleOptions {
+  /**
+   * 直接替代模块加载器, 用于解析模块
+   */
   parser?: (mod: any, options: Pick<LoadModuleOptions, Exclude<keyof LoadModuleOptions, 'parser'>>) => any;
+  /**
+   * 获取模块加载器选项
+   */
+  getOptions?: (type: string, mod: any, options: Record<string, any>) => any;
 
   [key: string]: any;
 }
@@ -30,13 +58,39 @@ export type DeepRequired<O> = O extends (...args: any[]) => any ? O : O extends 
 } : O;
 
 export interface GenerateTypeOptions {
+  /**
+   * 源码目录
+   * @default src
+   */
   sourceDir?: string;
+  /**
+   * 生成类型文件函数
+   */
   generateTypeFunc?: (fileInfo: FileInfoMap) => string | Promise<string>;
+  /**
+   * 模块加载器选项
+   */
   loadModuleOptions?: Partial<Record<ModuleType, LoadModuleOptions>>;
+  /**
+   * 模块加载顺序
+   * @default ['config', 'extend', 'routerSchema', 'service', 'middlewares', 'controller', 'router']
+   */
   loadModuleOrder?: (ModuleType | string)[];
+  /**
+   * 模块钩子
+   */
   hooks?: {
+    /**
+     * 模块加载前钩子
+     */
     onModulesLoadBefore?: (type: string, modules: FileInfo[]) => any;
+    /**
+     * 模块文件加载完成钩子
+     */
     onModuleLoaded?: (moduleInfo: DeepRequired<FileInfo>) => any;
+    /**
+     * 模块加载完成钩子
+     */
     onModulesLoaded?: (type: string, modules: FileInfo[]) => any;
   };
 }
@@ -55,15 +109,36 @@ export interface BuildConfig {
 }
 
 export interface ModuleLoadedContext {
+  /**
+   * 应用实例
+   */
   app: TeeKoa.Application;
+  /**
+   * 路由实例
+   */
   router: KoaRouter;
+  /**
+   * 模块信息
+   */
   moduleInfo: DeepRequired<FileInfo>;
 }
 
 export interface ModuleHandlerContext {
+  /**
+   * 模块类型
+   */
   type: string;
+  /**
+   * 模块内容
+   */
   mod: any;
+  /**
+   * 应用实例
+   */
   app: TeeKoa.Application;
+  /**
+   * 路由实例
+   */
   router: KoaRouter;
 }
 
@@ -91,6 +166,11 @@ export interface GenerateTypeConfig {
    * 自定义需要返回值类型的模块
    */
   customNeedReturnTypeModules?: string[];
+  /**
+   * 是否使用绝对路径
+   * @default false
+   */
+  useAbsolutePath?: boolean;
 }
 
 export interface ConfigFile {
@@ -129,19 +209,61 @@ export interface ConfigFile {
 }
 
 export interface Storage {
+  /**
+   * 应用实例
+   */
   app: TeeKoa.Application;
+  /**
+   * 路由实例
+   */
   router: KoaRouter;
+  /**
+   * 配置
+   */
   config: DeepRequired<ConfigFile>;
+  /**
+   * 生成类型文件函数
+   */
   options: GenerateTypeOptions;
+  /**
+   * jiti
+   */
   jiti: Jiti;
+  /**
+   * 监听服务
+   */
   server: Server;
+  /**
+   * 是否是生产环境
+   */
   isProd: boolean;
+  /**
+   * 开发环境配置
+   */
   devOptions: DevOptions;
 }
 
 export interface DevOptions {
+  /**
+   * 项目包路径
+   * @default /
+   */
   pkgPath: string;
+  /**
+   * 源码目录
+   * @default src
+   */
   sourceDir: string;
+  /**
+   * 启动端口
+   * @default 3000
+   */
   port: number;
+  /**
+   * 是否是命令行
+   * @default false
+   */
   isCli: boolean;
 }
+
+export type TeeOptions<T extends string> = TeeKoa.SetupOptionMap[T];

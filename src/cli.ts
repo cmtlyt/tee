@@ -66,8 +66,9 @@ const dev = defineCommand({
     setStorage('devOptions', devOptions);
     const { app } = await bootstrap();
     await devHandler(devOptions);
-    setStorage('server', app.listen(port));
-    consola.box('live server', `http://localhost:${port}`);
+    setStorage('server', app.listen(port, () => {
+      consola.box('live server', `http://localhost:${port}`);
+    }));
   },
 });
 

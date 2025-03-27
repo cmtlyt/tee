@@ -26,7 +26,7 @@ export async function bootstrap(_options?: GenerateTypeOptions) {
 
   app.use(router.routes()).use(router.allowedMethods());
 
-  if (!getStorage('isProd')) {
+  if (!getStorage('isProd', false)) {
     fs.writeFileSync(resolve(sourcePath, 'module.d.ts'), typeDeclarations, 'utf-8');
   }
 
