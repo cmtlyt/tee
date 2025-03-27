@@ -6,12 +6,12 @@ import { getStorage } from '../storage';
 
 export function getItemType(item: Pick<FileInfo, 'type' | 'relativePath' | 'path'>) {
   const { generateTypeConfig: { customNeedReturnTypeModules, useAbsolutePath } } = getStorage('config');
-  const path = useAbsolutePath ? item.path : item.relativePath;
+  const path = useAbsolutePath ? item.path : `./${item.relativePath}`;
   if (!path)
     return '{}';
   if (NEED_RETURN_TYPES.includes(item.type) || customNeedReturnTypeModules.includes(item.type))
-    return `Awaited<ReturnType<typeof import('./${path}')['default']>>${NEED_READ_PROTOTYPE_TYPES.includes(item.type) ? `['prototype']` : ''}`;
-  return `typeof import('./${path}')['default']${NEED_READ_PROTOTYPE_TYPES.includes(item.type) ? `['prototype']` : ''}`;
+    return `Awaited<ReturnType<typeof import('${path}')['default']>>${NEED_READ_PROTOTYPE_TYPES.includes(item.type) ? `['prototype']` : ''}`;
+  return `typeof import('${path}')['default']${NEED_READ_PROTOTYPE_TYPES.includes(item.type) ? `['prototype']` : ''}`;
 }
 
 interface TypeInfo {
