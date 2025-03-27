@@ -265,3 +265,5 @@ export interface DevOptions {
    */
   isCli: boolean;
 }
+
+export type TeeOptions<T extends string> = TeeKoa.SetupOptionMap[T];

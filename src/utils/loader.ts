@@ -5,6 +5,7 @@ import { MODULE_LOAD_ORDER } from '../constant';
 import { getStorage, getStorages } from '../storage';
 import { getFileInfoMapAndTypeDeclarations } from './get-info';
 import { jitiImport } from './jiti-import';
+import { getConfigExtendsOptions, getControllerExtendsOptions, getExtendExtendsOptions, getMiddlewareExtendsOptions, getRouterExtendsOptions, getRouterSchemaExtendsOptions, getServiceExtendsOptions } from './module-extends-options';
 
 export function getModuleLoaded(app: TeeKoa.Application, router: KoaRouter) {
   const { moduleHook } = getStorage('config');
@@ -74,15 +75,13 @@ function getModuleHandler(loadModuleOptions: GenerateTypeOptions['loadModuleOpti
       }
       case 'config':
       case 'extend':
-      case 'middlewares':{
+      case 'middlewares':
+      case 'routerSchema':{
         return mod(options);
       }
       case 'router':{
         await mod(options);
         return options.router;
-      }
-      case 'routerSchema':{
-        return mod;
       }
       default: {
         const result = await otherModParser({ type: _type, mod, app, router });
@@ -134,18 +133,34 @@ export async function baseLoadModule(options: GenerateTypeOptions) {
   return { ...other, fileInfoMap };
 }
 
+function getLoadModuleOptions(app: TeeKoa.Application, router: KoaRouter) {
+  const appRouterOptions = { app, router };
+  return {
+    config: { app, ...getConfigExtendsOptions(appRouterOptions) },
+    controller: { app, ...getControllerExtendsOptions(appRouterOptions) },
+    extend: { app, ...getExtendExtendsOptions(appRouterOptions) },
+    middlewares: { app, router, ...getMiddlewareExtendsOptions(appRouterOptions) },
+    router: { getOptions: () => {
+      const localRouter = new KoaRouter();
+      return {
+        app,
+        router: localRouter,
+        ...getRouterExtendsOptions({
+          ...appRouterOptions,
+          router: localRouter,
+          globalRouter: router,
+        }),
+      };
+    } },
+    routerSchema: { app, ...getRouterSchemaExtendsOptions(appRouterOptions) },
+    service: { app, ...getServiceExtendsOptions(appRouterOptions) },
+  };
+}
+
 export async function loadModule(app: TeeKoa.Application, router: KoaRouter, options?: GenerateTypeOptions) {
   let configType = '';
   const { typeDeclarations, ...rest } = await baseLoadModule({
-    loadModuleOptions: {
-      config: { app },
-      controller: { app },
-      extend: { app },
-      middlewares: { app, router },
-      router: { getOptions: () => ({ app, router: new KoaRouter() }) },
-      routerSchema: { app },
-      service: { app },
-    },
+    loadModuleOptions: getLoadModuleOptions(app, router),
     hooks: {
       onModulesLoaded(type, modules) {
         if (type === 'config') {

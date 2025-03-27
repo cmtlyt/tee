@@ -1,5 +1,6 @@
 import type KoaRouter from '@koa/router';
 import type Koa from 'koa';
+import type { ConfigExtendsOptions, ControllerExtendsOptions, ExtendExtendsOptions, MiddlewareExtendsOptions, RouterExtendsOptions, RouterSchemaExtendsOptions, ServiceExtendsOptions } from './utils/module-extends-options';
 
 export * from './bootstrap';
 export * from './build';
@@ -29,15 +30,21 @@ declare namespace TeeKoa {
     controller: IController;
     service: IService;
   }
+  interface AppOptions {
+    app: Application;
+  }
+  interface RouterOptions {
+    router: KoaRouter;
+  }
   interface SetupOptionMap {
-    router: {
-      app: Application;
-      router: KoaRouter;
-    };
-    middleware: {
-      app: Application;
-      router: KoaRouter;
-    };
+    config: AppOptions & ConfigExtendsOptions;
+    controller: AppOptions & ControllerExtendsOptions;
+    extend: AppOptions & ExtendExtendsOptions;
+    middleware: AppOptions & RouterOptions & MiddlewareExtendsOptions;
+    router: AppOptions & RouterOptions & RouterExtendsOptions;
+    routerSchema: AppOptions & RouterSchemaExtendsOptions;
+    service: AppOptions & ServiceExtendsOptions;
+
     [key: string]: {
       app: Application;
     };
