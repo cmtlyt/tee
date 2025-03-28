@@ -1,3 +1,12 @@
+## [0.3.2](https://github.com/cmtlyt/tee/compare/v0.3.1...v0.3.2) (2025-03-28)
+
+
+### Bug Fixes
+
+* 配置类型合并错误 ([#17](https://github.com/cmtlyt/tee/issues/17)) ([a53201a](https://github.com/cmtlyt/tee/commit/a53201abc8ad61f747a9606793a1129a349f039f))
+
+
+
 ## [0.3.1](https://github.com/cmtlyt/tee/compare/v0.2.2...v0.3.1) (2025-03-27)
 
 
