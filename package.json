@@ -30,6 +30,7 @@
   ],
   "type": "module",
   "scripts": {
+    "prepublishOnly": "npm run build",
     "dev": "unbuild --watch",
     "build": "unbuild",
     "prepare": "husky",

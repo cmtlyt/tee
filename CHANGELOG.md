@@ -1,3 +1,12 @@
+## [0.3.3](https://github.com/cmtlyt/tee/compare/v0.3.2...v0.3.3) (2025-03-28)
+
+
+### Bug Fixes
+
+* 自定义context继承自默认 ([8a4f162](https://github.com/cmtlyt/tee/commit/8a4f162a7fa9d78d9a2113bde742f613de689027))
+
+
+
 ## [0.3.2](https://github.com/cmtlyt/tee/compare/v0.3.1...v0.3.2) (2025-03-28)
 
 
