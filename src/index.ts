@@ -22,21 +22,25 @@ declare namespace TeeKoa {
 
   interface IComputedConfig {}
 
-  interface Context {
+  interface Context extends Koa.DefaultContext {
     config: IComputedConfig;
     routerSchema: IRouterSchema;
   }
+
   interface Application extends Koa<Koa.DefaultState, Context>, IExtend {
     middlewares: IMiddlewares;
     controller: IController;
     service: IService;
   }
+
   interface AppOptions {
     app: Application;
   }
+
   interface RouterOptions {
     router: KoaRouter;
   }
+
   interface SetupOptionMap {
     config: AppOptions & ConfigExtendsOptions;
     controller: AppOptions & ControllerExtendsOptions;
@@ -50,6 +54,7 @@ declare namespace TeeKoa {
       app: Application;
     };
   }
+
   interface Middleware extends Koa.Middleware<Koa.DefaultState, Context> {}
 }
 
