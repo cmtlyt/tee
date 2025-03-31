@@ -1,3 +1,12 @@
+# [0.4.0](https://github.com/cmtlyt/tee/compare/v0.3.3...v0.4.0) (2025-03-31)
+
+
+### Features
+
+* feature/0.4.0 ([#18](https://github.com/cmtlyt/tee/issues/18)) ([5096e57](https://github.com/cmtlyt/tee/commit/5096e5785f7e59d95b974ac379557a5bdae9c8fe))
+
+
+
 ## [0.3.3](https://github.com/cmtlyt/tee/compare/v0.3.2...v0.3.3) (2025-03-28)
 
 
