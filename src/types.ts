@@ -1,6 +1,5 @@
 import type KoaRouter from '@koa/router';
 import type { Jiti } from 'jiti';
-
 import type { Server } from 'node:http';
 import type TeeKoa from '.';
 
