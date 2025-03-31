@@ -1,4 +1,4 @@
-import type { FileInfo, TeeKoa } from '../types';
+import type { DeepRequired, FileInfo, TeeKoa } from '../types';
 import process from 'node:process';
 import { defu } from '.';
 import { consola } from './consola';
@@ -14,12 +14,12 @@ export function getEnv(app: TeeKoa.Application) {
   return app.env || 'local';
 }
 
-export function configMerge(app: TeeKoa.Application, configs: FileInfo[]) {
+export function configMerge(app: TeeKoa.Application, configs: DeepRequired<FileInfo>[]) {
   const {
     default: defaultConfig = { config: {}, relativePath: '' },
     ...envConfigMap
   } = configs.reduce((result, item) => {
-    const { nameSep, module, relativePath } = item;
+    const { nameSep, moduleInfo: { content: module }, relativePath } = item;
     const name = nameSep.at(-1)!;
     try {
       if (name.includes('Default'))

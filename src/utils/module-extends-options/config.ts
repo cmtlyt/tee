@@ -1,7 +1,7 @@
-import type { AppRouterOptions } from './type';
+import type { AppRouterOptions, GetExtendsOptions } from './type';
 
 export function getConfigExtendsOptions(_options: AppRouterOptions) {
   return { };
 }
 
-export type ConfigExtendsOptions = ReturnType<typeof getConfigExtendsOptions>;
+export type ConfigExtendsOptions = GetExtendsOptions<typeof getConfigExtendsOptions>;

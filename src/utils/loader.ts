@@ -1,8 +1,9 @@
-import type { DeepRequired, FileInfo, GenerateTypeOptions, ModuleType, TeeKoa } from '../types';
+import type { DeepRequired, FileInfo, GenerateTypeOptions, ModuleInfo, ModuleType, TeeKoa } from '../types';
 import KoaRouter from '@koa/router';
 import { assoc, configMerge, consola, parseConfig } from '.';
 import { MODULE_LOAD_ORDER } from '../constant';
 import { getStorage, getStorages } from '../storage';
+import { createRouterInfoMap, createRouterSchemaInfoMap } from './data-map';
 import { getFileInfoMapAndTypeDeclarations } from './get-info';
 import { jitiImport } from './jiti-import';
 import { getConfigExtendsOptions, getControllerExtendsOptions, getExtendExtendsOptions, getMiddlewareExtendsOptions, getRouterExtendsOptions, getRouterSchemaExtendsOptions, getServiceExtendsOptions } from './module-extends-options';
@@ -12,10 +13,14 @@ export function getModuleLoaded(app: TeeKoa.Application, router: KoaRouter) {
   const { loaded } = moduleHook;
 
   return async (moduleInfo: DeepRequired<FileInfo>) => {
-    const { type: _type, module, nameSep, name } = moduleInfo;
+    const { type: _type, moduleInfo: { content: module }, nameSep, name } = moduleInfo;
+    const result = await loaded({ app, router, moduleInfo });
+    if (result)
+      return;
     switch (_type) {
       case 'router':{
         // 合并所有子路由到主路由中
+        createRouterInfoMap(moduleInfo);
         router.use(module.routes(), module.allowedMethods());
         return;
       }
@@ -28,9 +33,8 @@ export function getModuleLoaded(app: TeeKoa.Application, router: KoaRouter) {
         // 添加到上下文对象
         return (app as any)[name] = module;
       case 'routerSchema':{
-        const target = (app.context as any)[name] ||= {};
-        // 上下文合并对象
-        return Object.assign(target, module);
+        createRouterSchemaInfoMap(moduleInfo);
+        return assoc([_type, ...nameSep], module, app);
       }
       case 'middlewares':{
         const target = app.middlewares ||= {};
@@ -38,9 +42,6 @@ export function getModuleLoaded(app: TeeKoa.Application, router: KoaRouter) {
         return Object.assign(target, { [name]: module });
       }
       default:{
-        const result = await loaded({ app, router, moduleInfo });
-        if (result)
-          return;
         _type satisfies never;
         consola.warn('unknown type:', _type);
       }
@@ -49,12 +50,12 @@ export function getModuleLoaded(app: TeeKoa.Application, router: KoaRouter) {
 }
 
 function getModuleHandler(loadModuleOptions: GenerateTypeOptions['loadModuleOptions']) {
-  const { app, router, config: { moduleHook } } = getStorages(['app', 'router', 'config']);
+  const { config: { moduleHook } } = getStorages(['config']);
   const { parser: otherModParser } = moduleHook;
 
-  return async (_type: ModuleType, mod: any) => {
+  return async (_type: ModuleType, mod: any): Promise<ModuleInfo> => {
     const { parser, getOptions, ..._options } = loadModuleOptions?.[_type] || {};
-    const options = getOptions?.(_type, mod, _options) || _options;
+    const { transform = (mod: any) => mod, ...options } = getOptions?.(_type, mod, _options) || _options;
     if (parser) {
       const result = parser(mod, options);
       if (typeof result !== 'undefined')
@@ -63,32 +64,34 @@ function getModuleHandler(loadModuleOptions: GenerateTypeOptions['loadModuleOpti
     switch (_type) {
       case 'controller':
       case 'service':{
-        const Mod = await mod(options);
-        return new Proxy(new Mod(options), {
+        const Mod = await transform(await mod(options));
+        return { ...options, content: new Proxy(new Mod(options), {
           get(target, prop, receiver) {
             const result = Reflect.get(target, prop, receiver);
             if (typeof result === 'function')
               return result.bind(target);
             return result;
           },
-        });
+        }) };
       }
       case 'config':
       case 'extend':
       case 'middlewares':
       case 'routerSchema':{
-        return mod(options);
+        return { ...options, content: await transform(await mod(options)) };
       }
       case 'router':{
         await mod(options);
-        return options.router;
+        return { ...options, content: await transform(options.router) };
       }
       default: {
-        const result = await otherModParser({ type: _type, mod, app, router });
+        const otherOptions = { type: _type, mod, ...options };
+        const result = await otherModParser(otherOptions);
         if (typeof result !== 'undefined')
-          return result;
+          return { ...otherOptions, content: result };
         _type satisfies never;
       }
+        return { content: undefined };
     }
   };
 }
@@ -104,13 +107,13 @@ export async function baseLoadModule(options: GenerateTypeOptions) {
   const modulesLoadProcess = async (type: string, items: FileInfo[]) => {
     await onModulesLoadBefore(type, items);
     await Promise.all(items.map(async (item) => {
-      const result = await moduleHandler(item.type, (await jitiImport(item.path)).default);
-      await onModuleLoaded({ ...item, module: result });
-      if (!result)
+      const moduleInfo = await moduleHandler(item.type, (await jitiImport(item.path)).default);
+      await onModuleLoaded({ ...item, moduleInfo });
+      if (!moduleInfo)
         return;
-      item.module = result;
+      item.moduleInfo = moduleInfo;
     }));
-    await onModulesLoaded(type, items);
+    await onModulesLoaded(type, items as any);
     consola.success(`${type} module load done`);
   };
 
@@ -152,7 +155,7 @@ function getLoadModuleOptions(app: TeeKoa.Application, router: KoaRouter) {
         }),
       };
     } },
-    routerSchema: { app, ...getRouterSchemaExtendsOptions(appRouterOptions) },
+    routerSchema: { getOptions: () => ({ app, ...getRouterSchemaExtendsOptions(appRouterOptions) }) },
     service: { app, ...getServiceExtendsOptions(appRouterOptions) },
   };
 }
