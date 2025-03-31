@@ -28,6 +28,11 @@ export async function parseConfig() {
     generateTypeConfig: {
       customNeedReturnTypeModules: [],
       useAbsolutePath: false,
+      extendsInfo: {
+        importContent: '',
+        typeContent: '',
+      },
+      getInterface: () => false,
     },
   });
   setStorage('config', finishedConfig);

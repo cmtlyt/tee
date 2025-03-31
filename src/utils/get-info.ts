@@ -20,15 +20,19 @@ export async function getFileInfoMap({ sourceDir = 'src' }) {
 
   const fileInfoMap = files.reduce((fileInfo, path) => {
     const relativePath = path.slice(srcPath.length).replace(/^[\\/]/, '');
-    const [type, ...names] = relativePath.replace(/\.[^.]*$/, '').split(/[\\/]/);
-    if (!names?.length)
+    const [type, ...nameSep] = relativePath
+      .replace(/\.[^.]*$/, '')
+      .replace(/\./g, '-')
+      .split(/[\\/]/)
+      .map(item => camelCase(item));
+    if (!nameSep?.length)
       return fileInfo;
     (fileInfo[type as ModuleType] ||= []).push({
       type: type as ModuleType,
       path,
       relativePath,
-      name: camelCase(names.join('-').replace(/\./g, '-')),
-      nameSep: names.map(name => camelCase(name)),
+      name: camelCase(nameSep.join('-')),
+      nameSep,
     });
     return fileInfo;
   }, {} as FileInfoMap);

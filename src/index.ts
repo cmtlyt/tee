@@ -7,7 +7,7 @@ export * from './build';
 export * from './constant';
 export * from './define';
 
-export type { TeeOptions } from './types';
+export type { TeeMiddlewareCtx, TeeOptions } from './types';
 export { getEnv } from './utils';
 
 export type { Defu as MergeConfig } from 'defu';
@@ -24,13 +24,13 @@ declare namespace TeeKoa {
 
   interface Context extends Koa.DefaultContext {
     config: IComputedConfig;
-    routerSchema: IRouterSchema;
   }
 
   interface Application extends Koa<Koa.DefaultState, Context>, IExtend {
     middlewares: IMiddlewares;
     controller: IController;
     service: IService;
+    routerSchema: IRouterSchema;
   }
 
   interface AppOptions {

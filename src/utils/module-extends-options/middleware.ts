@@ -1,30 +1,54 @@
-import type { TeeKoa } from '../../types';
-import type { AppRouterOptions } from './type';
-
-type MiddlewareCtx = Parameters<TeeKoa.Application['middleware'][number]>[0];
+import type { TeeMiddlewareCtx } from '../../types';
+import type { AppRouterOptions, GetExtendsOptions } from './type';
+import { getStorage } from '../../storage';
 
 export function getMiddlewareExtendsOptions({ router }: AppRouterOptions) {
-  const getMatchLayer = (ctx: MiddlewareCtx) => {
-    const { path, method } = ctx;
-    const matchLayrt = router.match(path, method).path.find(item => item.opts.end);
-    return matchLayrt;
-  };
-  return {
-    getMatchLayer,
-    getMatchPath(ctx: MiddlewareCtx) {
-      const matchLayrt = getMatchLayer(ctx);
+  const handlers = {
+    getMatchLayer(ctx: TeeMiddlewareCtx) {
+      const { path, method } = ctx;
+      const matchLayrt = router.match(path, method).path.find(item => item.opts.end) || null;
+      return matchLayrt;
+    },
+    getPrefix(ctx: TeeMiddlewareCtx) {
+      const matchLayrt = this.getMatchLayer(ctx);
+      if (!matchLayrt)
+        return '';
+      return matchLayrt.opts.prefix || '';
+    },
+    getMatchRouterSchema(ctx: TeeMiddlewareCtx) {
+      const path = this.getMatchPath(ctx);
+      const routerInfoMap = getStorage('routerInfoMap', {});
+      const { schema } = routerInfoMap[String(path).slice(router.opts.prefix?.length || 0)] || {};
+      return schema || null;
+    },
+    getMatchRouterInfo(ctx: TeeMiddlewareCtx) {
+      const path = this.getMatchPath(ctx);
+      const routerInfoMap = getStorage('routerInfoMap', {});
+      return routerInfoMap[String(path).slice(router.opts.prefix?.length || 0)] || null;
+    },
+    getMatchPath(ctx: TeeMiddlewareCtx) {
+      const matchLayrt = this.getMatchLayer(ctx);
       if (!matchLayrt)
         return '';
       return matchLayrt.path;
     },
-    getParams(ctx: MiddlewareCtx) {
+    getParams(ctx: TeeMiddlewareCtx) {
       const { path } = ctx;
-      const matchLayrt = getMatchLayer(ctx);
+      const matchLayrt = this.getMatchLayer(ctx);
       if (!matchLayrt)
         return {};
       return matchLayrt.params(path, matchLayrt.captures(path));
     },
   };
+
+  return new Proxy(handlers, {
+    get(target, p, receiver) {
+      const result = Reflect.get(target, p, receiver);
+      if (typeof result === 'function')
+        return result.bind(target);
+      return result;
+    },
+  });
 }
 
-export type MiddlewareExtendsOptions = ReturnType<typeof getMiddlewareExtendsOptions>;
+export type MiddlewareExtendsOptions = GetExtendsOptions<typeof getMiddlewareExtendsOptions>;

@@ -1,7 +1,7 @@
 import type KoaRouter from '@koa/router';
 import type { Jiti } from 'jiti';
-import type { Server } from 'node:http';
 
+import type { Server } from 'node:http';
 import type TeeKoa from '.';
 
 export { TeeKoa };
@@ -10,6 +10,11 @@ export { TeeKoa };
  * 内置模块类型
  */
 export type ModuleType = 'controller' | 'service' | 'middlewares' | 'router' | 'config' | 'extend' | 'routerSchema';
+
+export interface ModuleInfo {
+  content: any;
+  [key: string]: any;
+}
 
 export interface FileInfo {
   /**
@@ -35,7 +40,7 @@ export interface FileInfo {
   /**
    * 模块内容
    */
-  module?: any;
+  moduleInfo?: ModuleInfo;
 }
 
 export type FileInfoMap = Record<ModuleType, FileInfo[]>;
@@ -91,7 +96,7 @@ export interface GenerateTypeOptions {
     /**
      * 模块加载完成钩子
      */
-    onModulesLoaded?: (type: string, modules: FileInfo[]) => any;
+    onModulesLoaded?: (type: string, modules: DeepRequired<FileInfo>[]) => any;
   };
 }
 
@@ -146,9 +151,9 @@ export interface ModuleHook {
   /**
    * 模块加载完成钩子
    *
-   * 用于将模块内容注入到上下文, 只有在内置模块无法处理时调用
+   * 用于将模块内容注入到上下文
    *
-   * 返回 true 表示已处理, 返回 false 则表示未处理并跳出警告
+   * 返回 true 表示已处理不进行默认处理, 返回 false 则表示未处理并执行默认处理, 如果不存在默认处理方式则跳出警告
    */
   loaded?: (ctx: ModuleLoadedContext) => boolean | Promise<boolean>;
   /**
@@ -161,6 +166,15 @@ export interface ModuleHook {
   parser?: (ctx: ModuleHandlerContext) => any | Promise<any>;
 }
 
+export interface TypeInfo {
+  [key: string]: string | TypeInfo;
+}
+
+export interface GenerateTypeExtendsConfig {
+  importContent?: string | ((typeInfoMap: TypeInfo) => string | Promise<string>);
+  typeContent?: string | ((typeInfoMap: TypeInfo) => string | Promise<string>);
+}
+
 export interface GenerateTypeConfig {
   /**
    * 自定义需要返回值类型的模块
@@ -171,6 +185,8 @@ export interface GenerateTypeConfig {
    * @default false
    */
   useAbsolutePath?: boolean;
+  extendsInfo?: GenerateTypeExtendsConfig;
+  getInterface?: (moduleType: string, typeInfoMap: TypeInfo) => void | string | boolean | Promise<string | void | boolean>;
 }
 
 export interface ConfigFile {
@@ -208,7 +224,16 @@ export interface ConfigFile {
   generateTypeConfig?: GenerateTypeConfig;
 }
 
+export interface RouterInfo {
+  filePath: string;
+  path: string | RegExp;
+  schema?: any;
+  schemaPath: string;
+  prefix?: string;
+}
+
 export interface Storage {
+  routerInfoMap: Record<string, RouterInfo>;
   /**
    * 应用实例
    */
@@ -267,3 +292,5 @@ export interface DevOptions {
 }
 
 export type TeeOptions<T extends string> = TeeKoa.SetupOptionMap[T];
+
+export type TeeMiddlewareCtx = Parameters<TeeKoa.Application['middleware'][number]>[0];
