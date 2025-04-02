@@ -37,7 +37,7 @@ function getSpace(indent: number) {
 
 function generateType(typeInfoMap: TypeInfo, indent = 0) {
   const typeList: string[] = [];
-  for (const name in typeInfoMap) {
+  Object.keys(typeInfoMap).sort().forEach((name) => {
     const typeInfo = typeInfoMap[name];
     const objFlag = typeof typeInfo === 'object';
     objFlag && typeList.push(`${getSpace(indent)}${indent ? `${name}: {` : `interface I${pascalCase(name)} {`}`);
@@ -48,7 +48,7 @@ function generateType(typeInfoMap: TypeInfo, indent = 0) {
       typeList.push(`${getSpace(indent)}${name}: ${typeInfo};`);
     }
     objFlag && typeList.push(`${getSpace(indent)}}`);
-  }
+  });
   return typeList.join('\n');
 }
 
@@ -82,15 +82,15 @@ export async function generateTypeString(fileInfo: FileInfoMap) {
   const originTypeInfoMap = generateTypeInfo(fileInfo);
   const typeInfoMap = { ...originTypeInfoMap };
 
-  const userTypeContent = [];
+  const userTypeContent: string[] = [];
 
-  for (const type in typeInfoMap) {
+  await Promise.all(Object.keys(typeInfoMap).sort().map(async (type) => {
     const _interface = await getInterface(type, typeInfoMap[type] as TypeInfo);
     if (!_interface)
-      continue;
+      return;
     delete typeInfoMap[type];
     userTypeContent.push(_interface);
-  }
+  }));
 
   const routerSchemaTypeContent = ''; // routerSchemaTypeMerge(typeInfoMap);
 

@@ -185,7 +185,7 @@ export interface GenerateTypeConfig {
    */
   useAbsolutePath?: boolean;
   extendsInfo?: GenerateTypeExtendsConfig;
-  getInterface?: (moduleType: string, typeInfoMap: TypeInfo) => void | string | boolean | Promise<string | void | boolean>;
+  getInterface?: (moduleType: string, typeInfoMap: TypeInfo) => void | string | false | Promise<string | void | false>;
 }
 
 export interface ConfigFile {
