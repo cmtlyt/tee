@@ -1,3 +1,12 @@
+## [0.4.1](https://github.com/cmtlyt/tee/compare/v0.4.0...v0.4.1) (2025-04-02)
+
+
+### Bug Fixes
+
+* 生成更稳定的类型文件 ([#19](https://github.com/cmtlyt/tee/issues/19)) ([a15a449](https://github.com/cmtlyt/tee/commit/a15a449dc13f41e11e10f357b76533a33d2b4e2c))
+
+
+
 # [0.4.0](https://github.com/cmtlyt/tee/compare/v0.3.3...v0.4.0) (2025-03-31)
 
 
