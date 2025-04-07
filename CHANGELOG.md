@@ -1,3 +1,12 @@
+# [0.5.0](https://github.com/cmtlyt/tee/compare/v0.4.1...v0.5.0) (2025-04-07)
+
+
+### Features
+
+* 新增grs命令通过routerSchema生成请求接口api ([#20](https://github.com/cmtlyt/tee/issues/20)) ([9788624](https://github.com/cmtlyt/tee/commit/97886246c9b2b6345b254f1726568275c84ebdfb))
+
+
+
 ## [0.4.1](https://github.com/cmtlyt/tee/compare/v0.4.0...v0.4.1) (2025-04-02)
 
 
