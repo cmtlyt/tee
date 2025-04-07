@@ -1,4 +1,4 @@
-import type { TeeMiddlewareCtx } from '../../types';
+import type { RouterSchema, TeeMiddlewareCtx } from '../../types';
 import type { AppRouterOptions, GetExtendsOptions } from './type';
 import { getStorage } from '../../storage';
 
@@ -15,7 +15,7 @@ export function getMiddlewareExtendsOptions({ router }: AppRouterOptions) {
         return '';
       return matchLayrt.opts.prefix || '';
     },
-    getMatchRouterSchema(ctx: TeeMiddlewareCtx) {
+    getMatchRouterSchema(ctx: TeeMiddlewareCtx): RouterSchema | null {
       const path = this.getMatchPath(ctx);
       const routerInfoMap = getStorage('routerInfoMap', {});
       const { schema } = routerInfoMap[String(path).slice(router.opts.prefix?.length || 0)] || {};

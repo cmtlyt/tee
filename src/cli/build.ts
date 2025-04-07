@@ -1,9 +1,9 @@
-import type { BuildConfig, FileInfoMap, ModuleType } from './types';
+import type { BuildConfig, FileInfoMap, ModuleType } from '../types';
 import { existsSync } from 'node:fs';
 import { build as esbuild } from 'esbuild';
 import { basename, resolve } from 'pathe';
 import { rimraf } from 'rimraf';
-import { defu, getFileInfoMap, getPkgInfo, parseConfig } from './utils';
+import { defu, getFileInfoMap, getPkgInfo, parseConfig } from '../utils';
 
 interface BuildOptions extends BuildConfig {
   sourceDir?: string;

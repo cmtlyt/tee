@@ -2,8 +2,9 @@ import type KoaRouter from '@koa/router';
 import type Koa from 'koa';
 import type { ConfigExtendsOptions, ControllerExtendsOptions, ExtendExtendsOptions, MiddlewareExtendsOptions, RouterExtendsOptions, RouterSchemaExtendsOptions, ServiceExtendsOptions } from './utils/module-extends-options';
 
-export * from './bootstrap';
-export * from './build';
+export * from './cli/bootstrap';
+export * from './cli/build';
+export * from './cli/run-prod';
 export * from './constant';
 export * from './define';
 

@@ -1,7 +1,8 @@
 import type KoaRouter from '@koa/router';
 import type { Jiti } from 'jiti';
 import type { Server } from 'node:http';
-import type TeeKoa from '.';
+import type TeeKoa from '..';
+import type { JsonSchema } from './schema-type';
 
 export { TeeKoa };
 
@@ -223,10 +224,14 @@ export interface ConfigFile {
   generateTypeConfig?: GenerateTypeConfig;
 }
 
+export type BaseRouterSchema = Record<RequestMethod | string & {}, Partial<Record<DataKey | string & {}, JsonSchema>>>;
+
+export type RouterSchema = Partial<BaseRouterSchema>;
+
 export interface RouterInfo {
   filePath: string;
   path: string | RegExp;
-  schema?: any;
+  schema?: DeepRequired<RouterSchema>;
   schemaPath: string;
   prefix?: string;
 }
@@ -265,6 +270,10 @@ export interface Storage {
    * 开发环境配置
    */
   devOptions: DevOptions;
+  /**
+   * 是否禁用 consola
+   */
+  disabledConsola: boolean;
 }
 
 export interface DevOptions {
@@ -293,3 +302,7 @@ export interface DevOptions {
 export type TeeOptions<T extends string> = TeeKoa.SetupOptionMap[T];
 
 export type TeeMiddlewareCtx = Parameters<TeeKoa.Application['middleware'][number]>[0];
+
+export type DataKey = 'params' | 'query' | 'body';
+
+export type RequestMethod = 'get' | 'post' | 'put' | 'delete' | 'patch' | 'head' | 'options';
