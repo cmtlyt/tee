@@ -1,6 +1,6 @@
+import { setStorage } from '../storage';
+import { consola, getPkgInfo, parseConfig } from '../utils';
 import { bootstrap } from './bootstrap';
-import { setStorage } from './storage';
-import { consola, getPkgInfo, parseConfig } from './utils';
 
 export async function runProd() {
   setStorage('isProd', true);

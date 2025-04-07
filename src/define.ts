@@ -1,6 +1,6 @@
 import type KoaRouter from '@koa/router';
 import type Koa from 'koa';
-import type { ConfigFile, TeeKoa, TeeOptions } from './types';
+import type { ConfigFile, RouterSchema, TeeKoa, TeeOptions } from './types';
 
 interface DefineMiddlewareOptions {
   needWrap?: boolean;
@@ -38,7 +38,7 @@ export function defineExtend<C extends (options: TeeOptions<'extend'>) => any>(c
   return callback;
 }
 
-export function defineRouterSchema<C extends (options: TeeOptions<'routerSchema'>) => any>(callback: C): C {
+export function defineRouterSchema<C extends (options: TeeOptions<'routerSchema'>) => Record<string, RouterSchema>>(callback: C): C {
   return callback;
 }
 
