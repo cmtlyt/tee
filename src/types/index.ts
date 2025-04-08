@@ -224,7 +224,12 @@ export interface ConfigFile {
   generateTypeConfig?: GenerateTypeConfig;
 }
 
-export type BaseRouterSchema = Record<RequestMethod | string & {}, Partial<Record<DataKey | string & {}, JsonSchema>>>;
+export type RouterDataSchema = Partial<{
+  response: Record<string, JsonSchema>;
+  [key: string]: JsonSchema | Record<string, JsonSchema>;
+} & Record<DataKey, JsonSchema>>;
+
+export type BaseRouterSchema = Record<RequestMethod | string & {}, RouterDataSchema>;
 
 export type RouterSchema = Partial<BaseRouterSchema>;
 

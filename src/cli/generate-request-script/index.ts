@@ -1,5 +1,5 @@
 import type TeeKoa from '../..';
-import type { DataKey, RequestMethod, RouterInfo } from '../../types';
+import type { DataKey, RequestMethod, RouterDataSchema, RouterInfo, RouterSchema } from '../../types';
 import fs from 'node:fs';
 import path from 'node:path';
 import { noop } from '@cmtlyt/base';
@@ -23,7 +23,7 @@ function filterValidRouter(routerInfoMap: Record<string, RouterInfo>) {
   return validRouterInfoMap;
 }
 
-type TypeInfo = Partial<Record<DataKey, string>>;
+type TypeInfo = Partial<Record<DataKey | 'response', string>>;
 
 export type MethodTypeInfo = {
   path: string | RegExp;
@@ -41,7 +41,7 @@ function getDataKeyName(key: string): DataKey {
     case 'body':
       return 'body';
     default:
-      return 'body';
+      return key as DataKey;
   }
 }
 
@@ -56,26 +56,42 @@ function getRouterParams(path: string) {
   return params;
 }
 
-function genereateTypeInfo(routerInfoMap: Record<string, RouterInfo>) {
+function getRouterDataSchema(dataKey: string, schema: RouterDataSchema) {
+  if (dataKey === 'response') {
+    return schema.response?.['200'] || schema.response?.default || {};
+  }
+  return schema[dataKey];
+}
+
+function parseRouterDataSchema(methodSchema: RouterDataSchema) {
+  const typeInfo: TypeInfo = {};
+  for (const dataKey in methodSchema) {
+    const schema = getRouterDataSchema(dataKey, methodSchema)!;
+    const declaration = generateTypes(schema, { addDefaults: false, addExport: false, allowExtraKeys: true });
+    typeInfo[getDataKeyName(dataKey)] = declaration.slice(declaration.indexOf('{')).replace(/\n\s*/g, ' ');
+  }
+  return typeInfo;
+}
+
+function parseMethodSchema(schemaMap: RouterSchema) {
+  const methodTypeInfo: Partial<Record<RequestMethod, TypeInfo>> = {};
+  for (const method in schemaMap) {
+    const methodSchema = schemaMap[method as RequestMethod];
+    methodTypeInfo[method as RequestMethod] = parseRouterDataSchema(methodSchema!);
+  }
+  return methodTypeInfo;
+}
+
+function parseTypeInfo(routerInfoMap: Record<string, RouterInfo>) {
   const typeInfoList: MethodTypeInfo[] = [];
   for (const stringPath in routerInfoMap) {
     const routerSchema = routerInfoMap[stringPath];
     const { schema: schemaMap, path } = routerSchema;
-    const methodTypeInfo: MethodTypeInfo = { path, schemaPath: stringPath, params: getRouterParams(stringPath) };
-    if (!schemaMap) {
+    const baseMethodTypeInfo: MethodTypeInfo = { path, schemaPath: stringPath, params: getRouterParams(stringPath) };
+    if (!schemaMap)
       continue;
-    }
-    for (const method in schemaMap) {
-      const methodSchema = schemaMap[method as RequestMethod];
-      const typeInfo: TypeInfo = {};
-      for (const dataKey in methodSchema) {
-        const schema = methodSchema[dataKey as DataKey];
-        const declaration = generateTypes(schema, { addDefaults: false, addExport: false, allowExtraKeys: true });
-        typeInfo[getDataKeyName(dataKey)] = declaration.slice(declaration.indexOf('{')).replace(/\n\s*/g, ' ');
-      }
-      methodTypeInfo[method as RequestMethod] = typeInfo;
-    }
-    typeInfoList.push(methodTypeInfo);
+    const methodTypeInfo = parseMethodSchema(schemaMap);
+    typeInfoList.push(Object.assign(baseMethodTypeInfo, methodTypeInfo));
   }
   return typeInfoList;
 }
@@ -104,10 +120,10 @@ function parseAPIInfo(typeInfoList: MethodTypeInfo[]) {
   typeInfoList.forEach((item) => {
     const { path: _, schemaPath, params, ...methodType } = item;
     for (const method in methodType) {
-      const typeInfo = methodType[method as RequestMethod]!;
+      const { response, ...typeInfo } = methodType[method as RequestMethod]!;
       const methodName = getMethodName(method, schemaPath);
       const apiInfo = {
-        type: `${methodName}: <T>(option: ${getMethodOptionsType(typeInfo)}) => Promise<T>`,
+        type: `${methodName}: <T = ${response || 'unknown'}>(option: ${getMethodOptionsType(typeInfo)}) => Promise<T>`,
         request: `${methodName}: request(${JSON.stringify(Object.assign({ method: method.toLowerCase() }, pick_(['path', 'schemaPath', 'params'], item)))})`,
       };
       apiInfoList.push(apiInfo);
@@ -116,7 +132,7 @@ function parseAPIInfo(typeInfoList: MethodTypeInfo[]) {
   return apiInfoList;
 }
 
-function generateAPIContentInfo(apiInfo: APIInfo[]) {
+function parseAPIContentInfo(apiInfo: APIInfo[]) {
   const { type, method } = apiInfo.reduce<{ type: string[]; method: string[] }>((prev, cur) => {
     prev.type.push(cur.type);
     prev.method.push(cur.request);
@@ -152,9 +168,9 @@ export async function generateRequestScriptCli() {
   const routerInfoMap = getStorage('routerInfoMap');
   const validRouterInfoMap = filterValidRouter(routerInfoMap);
 
-  const typeInfoList = genereateTypeInfo(validRouterInfoMap);
+  const typeInfoList = parseTypeInfo(validRouterInfoMap);
   const apiInfoList = parseAPIInfo(typeInfoList);
-  const contentInfo = generateAPIContentInfo(apiInfoList);
+  const contentInfo = parseAPIContentInfo(apiInfoList);
 
   const outputContent = generateAPIFile(contentInfo);
 
@@ -166,10 +182,3 @@ export async function generateRequestScriptCli() {
 
   fs.writeFileSync(outputFile, outputContent);
 }
-
-// console.dir(generateTypes({
-//   type: 'object',
-//   properties: { id: { type: 'string' } },
-// }, {
-//   interfaceName: pascalCase('get/user/info/:id'),
-// }));

@@ -37,14 +37,22 @@ const run = defineCommand({
   },
 });
 
-const generateRequestScript = defineCommand({
+const requestScript = defineCommand({
   meta: {
-    name: 'generateRequestScript',
-    description: 'Generate request script',
+    name: 'requestScript',
+    description: 'Generate request script with router schema',
   },
   async run() {
     await generateRequestScriptCli();
   },
+});
+
+const generate = defineCommand({
+  meta: {
+    name: 'generate',
+    description: 'Generate other file',
+  },
+  subCommands: { requestScript },
 });
 
 const main = defineCommand({
@@ -53,7 +61,7 @@ const main = defineCommand({
     version,
     description: '@cmtlyt/tee cli',
   },
-  subCommands: { dev, build, run, grs: generateRequestScript },
+  subCommands: { dev, build, run, generate, g: generate },
 });
 
 runMain(main);
