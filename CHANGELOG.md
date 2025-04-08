@@ -1,3 +1,12 @@
+## [0.5.1](https://github.com/cmtlyt/tee/compare/v0.5.0...v0.5.1) (2025-04-08)
+
+
+### Features
+
+* 抽离generate命令&支持返回值schema ([#21](https://github.com/cmtlyt/tee/issues/21)) ([2d5c756](https://github.com/cmtlyt/tee/commit/2d5c7562bcd1631e8957b35322e03b16dfc5ca2f))
+
+
+
 # [0.5.0](https://github.com/cmtlyt/tee/compare/v0.4.1...v0.5.0) (2025-04-07)
 
 
