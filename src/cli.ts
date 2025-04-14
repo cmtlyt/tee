@@ -7,6 +7,7 @@ import { build as buildApp } from './cli/build';
 import { generateRequestScriptCli } from './cli/generate-request-script';
 import { runProd } from './cli/run-prod';
 
+/** dev 命令 */
 const dev = defineCommand({
   meta: {
     name: 'dev',
@@ -17,6 +18,7 @@ const dev = defineCommand({
   },
 });
 
+/** build 命令 */
 const build = defineCommand({
   meta: {
     name: 'build',
@@ -27,6 +29,7 @@ const build = defineCommand({
   },
 });
 
+/** run 命令 */
 const run = defineCommand({
   meta: {
     name: 'run',
@@ -37,6 +40,7 @@ const run = defineCommand({
   },
 });
 
+/** 生成前端请求文件命令 */
 const requestScript = defineCommand({
   meta: {
     name: 'requestScript',
@@ -47,6 +51,7 @@ const requestScript = defineCommand({
   },
 });
 
+/** generate 命令 */
 const generate = defineCommand({
   meta: {
     name: 'generate',
@@ -55,6 +60,7 @@ const generate = defineCommand({
   subCommands: { requestScript },
 });
 
+/** tee 命令主入口 */
 const main = defineCommand({
   meta: {
     name: 'tee',

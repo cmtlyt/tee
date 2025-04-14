@@ -8,6 +8,11 @@ import { getFileInfoMapAndTypeDeclarations } from './get-info';
 import { jitiImport } from './jiti-import';
 import { getConfigExtendsOptions, getControllerExtendsOptions, getExtendExtendsOptions, getMiddlewareExtendsOptions, getRouterExtendsOptions, getRouterSchemaExtendsOptions, getServiceExtendsOptions } from './module-extends-options';
 
+/**
+ * 获取单个模块加载结束后的方法
+ *
+ * 例如一个 router 模块加载成功后就会执行这个方法
+ */
 export function getModuleLoaded(app: TeeKoa.Application, router: KoaRouter) {
   const { moduleHook } = getStorage('config');
   const { loaded } = moduleHook;
@@ -19,8 +24,8 @@ export function getModuleLoaded(app: TeeKoa.Application, router: KoaRouter) {
       return;
     switch (_type) {
       case 'router':{
-        // 合并所有子路由到主路由中
         createRouterInfoMap(moduleInfo);
+        // 合并所有子路由到主路由中
         router.use(module.routes(), module.allowedMethods());
         return;
       }
@@ -49,6 +54,9 @@ export function getModuleLoaded(app: TeeKoa.Application, router: KoaRouter) {
   };
 }
 
+/**
+ * 获取模块的处理方法
+ */
 function getModuleHandler(loadModuleOptions: GenerateTypeOptions['loadModuleOptions']) {
   const { config: { moduleHook } } = getStorages(['config']);
   const { parser: otherModParser } = moduleHook;
@@ -96,6 +104,9 @@ function getModuleHandler(loadModuleOptions: GenerateTypeOptions['loadModuleOpti
   };
 }
 
+/**
+ * 基本加载模块方法
+ */
 export async function baseLoadModule(options: GenerateTypeOptions) {
   const { loadModuleOptions, loadModuleOrder = MODULE_LOAD_ORDER, hooks = {} } = options;
   const { onModuleLoaded = () => {}, onModulesLoaded = () => {}, onModulesLoadBefore = () => {} } = hooks;
@@ -104,6 +115,11 @@ export async function baseLoadModule(options: GenerateTypeOptions) {
 
   const moduleHandler = getModuleHandler(loadModuleOptions || {} as Record<string, any>);
 
+  /**
+   * 加载模块所有文件
+   *
+   * 例如 router/test1.ts 和 router/test2.ts
+   */
   const modulesLoadProcess = async (type: string, items: FileInfo[]) => {
     await onModulesLoadBefore(type, items);
     await Promise.all(items.map(async (item) => {
@@ -136,6 +152,9 @@ export async function baseLoadModule(options: GenerateTypeOptions) {
   return { ...other, fileInfoMap };
 }
 
+/**
+ * 获取每个模块加载时需要的入参
+ */
 function getLoadModuleOptions(app: TeeKoa.Application, router: KoaRouter) {
   const appRouterOptions = { app, router };
   return {
@@ -160,6 +179,9 @@ function getLoadModuleOptions(app: TeeKoa.Application, router: KoaRouter) {
   };
 }
 
+/**
+ * 默认配置的模块加载方法
+ */
 export async function loadModule(app: TeeKoa.Application, router: KoaRouter, options?: GenerateTypeOptions) {
   let configType = '';
   const { typeDeclarations, ...rest } = await baseLoadModule({

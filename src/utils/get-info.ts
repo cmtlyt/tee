@@ -5,11 +5,17 @@ import { resolvePackageJSON } from 'pkg-types';
 import { camelCase } from 'scule';
 import { generateTypeString } from './generate-type';
 
+/**
+ * 获取项目 package.json 的路径和和目录
+ */
 export async function getPkgInfo() {
   const pkg = await resolvePackageJSON();
   return { pkg, pkgPath: dirname(pkg) };
 }
 
+/**
+ * 获取模块文件信息
+ */
 export async function getFileInfoMap({ sourceDir = 'src' }) {
   const { pkgPath } = await getPkgInfo();
   const srcPath = resolve(pkgPath, sourceDir);
@@ -40,6 +46,9 @@ export async function getFileInfoMap({ sourceDir = 'src' }) {
   return { pkgPath, sourcePath: srcPath, fileInfoMap };
 }
 
+/**
+ * 获取模块文件信息和对应的类型
+ */
 export async function getFileInfoMapAndTypeDeclarations({
   sourceDir = 'src',
   generateTypeFunc = generateTypeString,

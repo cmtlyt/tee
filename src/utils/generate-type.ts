@@ -5,6 +5,9 @@ import { pascalCase } from 'scule';
 import { NEED_READ_PROTOTYPE_TYPES, NEED_RETURN_TYPES } from '../constant';
 import { getStorage } from '../storage';
 
+/**
+ * 获取单个文件的类型
+ */
 export function getItemType(item: Pick<FileInfo, 'type' | 'relativePath' | 'path'>) {
   const { generateTypeConfig: { customNeedReturnTypeModules, useAbsolutePath } } = getStorage('config');
   const path = useAbsolutePath ? item.path : item.relativePath && `./${item.relativePath}`;
@@ -15,6 +18,9 @@ export function getItemType(item: Pick<FileInfo, 'type' | 'relativePath' | 'path
   return `typeof import('${path}')['default']${NEED_READ_PROTOTYPE_TYPES.includes(item.type) ? `['prototype']` : ''}`;
 }
 
+/**
+ * 生成所有文件的类型信息
+ */
 function generateTypeInfo(fileInfoMap: FileInfoMap) {
   const { ignoreModules } = getStorage('config');
   const typeInfo: TypeInfo = {};
@@ -31,10 +37,16 @@ function generateTypeInfo(fileInfoMap: FileInfoMap) {
   return typeInfo;
 }
 
+/**
+ * 获取指定个数的空格
+ */
 function getSpace(indent: number) {
   return ' '.repeat(indent + 2);
 }
 
+/**
+ * 生成完整类型
+ */
 function generateType(typeInfoMap: TypeInfo, indent = 0) {
   const typeList: string[] = [];
   Object.keys(typeInfoMap).sort().forEach((name) => {
@@ -76,6 +88,9 @@ function generateType(typeInfoMap: TypeInfo, indent = 0) {
 //   return `interface IRouterSchema extends ${allExtendsTypes.join(', ')}, Record<string, any> {}`;
 // }
 
+/**
+ * 解析文件信息并生成类型字符串
+ */
 export async function generateTypeString(fileInfo: FileInfoMap) {
   const { name } = await readPackageJSON(import.meta.url);
   const { generateTypeConfig: { extendsInfo, getInterface } } = getStorage('config');

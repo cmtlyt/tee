@@ -2,6 +2,9 @@ import type { RouterSchema, TeeMiddlewareCtx } from '../../types';
 import type { AppRouterOptions, GetExtendsOptions } from './type';
 import { getStorage } from '../../storage';
 
+/**
+ * middleware 模块加载时的额外入参, 用于提供辅助方法等
+ */
 export function getMiddlewareExtendsOptions({ router }: AppRouterOptions) {
   const handlers = {
     getMatchLayer(ctx: TeeMiddlewareCtx) {

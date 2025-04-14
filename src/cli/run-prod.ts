@@ -2,6 +2,9 @@ import { setStorage } from '../storage';
 import { consola, getPkgInfo, parseConfig } from '../utils';
 import { bootstrap } from './bootstrap';
 
+/**
+ * 运行打包后的应用
+ */
 export async function runProd() {
   setStorage('isProd', true);
 

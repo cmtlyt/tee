@@ -1,5 +1,8 @@
 import type { AppRouterOptions, GetExtendsOptions } from './type';
 
+/**
+ * router-schema 模块加载时的额外入参, 用于提供辅助方法等
+ */
 export function getRouterSchemaExtendsOptions(_: AppRouterOptions) {
   const handler = {
     prefix: '',

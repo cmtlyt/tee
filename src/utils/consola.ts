@@ -2,6 +2,9 @@ import { noop } from '@cmtlyt/base';
 import { createConsola } from 'consola';
 import { getStorage } from '../storage';
 
+/**
+ * 日志输出工具
+ */
 export const consola = new Proxy(createConsola({}), {
   get(target, prop, receiver) {
     if (getStorage('disabledConsola', false))

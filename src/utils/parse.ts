@@ -6,6 +6,9 @@ import { getStorage, hasStorage, setStorage } from '../storage';
 import { getPkgInfo } from './get-info';
 import { jitiImport } from './jiti-import';
 
+/**
+ * 解析配置文件的内容
+ */
 export async function parseConfig() {
   if (hasStorage('config'))
     return getStorage('config');
@@ -39,6 +42,9 @@ export async function parseConfig() {
   return finishedConfig;
 }
 
+/**
+ * 补全类型生成所需要的选项
+ */
 export async function parseOptions(options?: GenerateTypeOptions) {
   if (hasStorage('options'))
     return getStorage('options');

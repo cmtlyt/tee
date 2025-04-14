@@ -6,6 +6,9 @@ import { resolve } from 'pathe';
 import { getStorage, setStorage } from '../storage';
 import { consola, getPkgInfo, loadModule, parseConfig, parseOptions, runSourceMain } from '../utils';
 
+/**
+ * 初始化应用, 返回应用实例和路由
+ */
 export async function bootstrap(_options?: GenerateTypeOptions) {
   const options = await parseOptions(_options);
 
@@ -45,6 +48,9 @@ function errorHandler(e: Error) {
   consola.error(e);
 }
 
+/**
+ * 重启服务
+ */
 async function restart(options: DevOptions) {
   try {
     const oldServer = getStorage('server');
@@ -60,12 +66,20 @@ async function restart(options: DevOptions) {
   }
 }
 
+/**
+ * 监听文件变化的处理函数
+ *
+ * 打印日志和重启服务
+ */
 const watchHandler = debounce(async (options: DevOptions) => {
   consola.start('Watching for changes...');
   await restart(options);
   consola.success('Restarted');
 });
 
+/**
+ * 监听文件变化
+ */
 async function devHandler(options: DevOptions) {
   const { pkgPath, sourceDir } = options;
   fs.watchFile(resolve(pkgPath, 'main.ts'), () => watchHandler(options));
@@ -76,6 +90,9 @@ async function devHandler(options: DevOptions) {
   });
 }
 
+/**
+ * 命令行初始化应用的函数, 进行一些前后置处理
+ */
 export async function bootstrapCli() {
   const { port, sourceDir } = await parseConfig();
   const { pkgPath } = await getPkgInfo();
