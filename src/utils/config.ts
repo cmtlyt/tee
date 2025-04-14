@@ -4,6 +4,11 @@ import { defu } from '.';
 import { consola } from './consola';
 import { getItemType } from './generate-type';
 
+/**
+ * 获取当前环境
+ *
+ * 目前仅用于 config 模块的读取和合并
+ */
 export function getEnv(app: TeeKoa.Application) {
   if (process.env.TEE_ENV)
     return process.env.TEE_ENV;
@@ -14,6 +19,9 @@ export function getEnv(app: TeeKoa.Application) {
   return app.env || 'local';
 }
 
+/**
+ * 根据当前运行环境合并 config 模块
+ */
 export function configMerge(app: TeeKoa.Application, configs: DeepRequired<FileInfo>[]) {
   const {
     default: defaultConfig = { config: {}, relativePath: '' },
@@ -46,6 +54,7 @@ export function configMerge(app: TeeKoa.Application, configs: DeepRequired<FileI
   const envConfigType = getItemType({ path: envConfig.relativePath, relativePath: envConfig.relativePath, type: 'config' });
   const computedConfig = defu(envConfig.config, defaultConfig.config);
 
+  // 生成 config 模块类型
   const configTypeDeclarations = `interface IComputedConfig extends MergeConfig<${defaultConfigType}, [${envConfigType}]> {}`;
 
   return { config: computedConfig, configTypeDeclarations };

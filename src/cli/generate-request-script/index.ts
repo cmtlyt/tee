@@ -12,6 +12,11 @@ import { getStorage, setStorage } from '../../storage';
 import { getPkgInfo, loadModule, parseConfig, parseOptions } from '../../utils';
 import { API_METHOD_SYMBOL, API_TYPE_SYMBOL, template } from './template';
 
+/**
+ * 过滤无效的路由
+ *
+ * TODO: 暂时没有无效的定义, 留个口子
+ */
 function filterValidRouter(routerInfoMap: Record<string, RouterInfo>) {
   const validRouterInfoMap: Record<string, RouterInfo> = {};
 
@@ -31,6 +36,9 @@ export type MethodTypeInfo = {
   params: string[];
 } & Partial<Record<RequestMethod, TypeInfo>>;
 
+/**
+ * 获取 dataKey 对应的字段的名称
+ */
 function getDataKeyName(key: string): DataKey {
   switch (key) {
     case 'params':
@@ -45,6 +53,9 @@ function getDataKeyName(key: string): DataKey {
   }
 }
 
+/**
+ * 通过字符串路径获取 params
+ */
 function getRouterParams(path: string) {
   const splitPath = path.split('/');
   const params: string[] = [];
@@ -56,6 +67,9 @@ function getRouterParams(path: string) {
   return params;
 }
 
+/**
+ * 获取 dataKey 对应的 schema
+ */
 function getRouterDataSchema(dataKey: string, schema: RouterDataSchema) {
   if (dataKey === 'response') {
     return schema.response?.['200'] || schema.response?.default || {};
@@ -63,6 +77,9 @@ function getRouterDataSchema(dataKey: string, schema: RouterDataSchema) {
   return schema[dataKey];
 }
 
+/**
+ * 解析 methodSchema 中对应 dataKey 的类型
+ */
 function parseRouterDataSchema(methodSchema: RouterDataSchema) {
   const typeInfo: TypeInfo = {};
   for (const dataKey in methodSchema) {
@@ -73,6 +90,9 @@ function parseRouterDataSchema(methodSchema: RouterDataSchema) {
   return typeInfo;
 }
 
+/**
+ * 解析接口 methodSchema
+ */
 function parseMethodSchema(schemaMap: RouterSchema) {
   const methodTypeInfo: Partial<Record<RequestMethod, TypeInfo>> = {};
   for (const method in schemaMap) {
@@ -82,6 +102,9 @@ function parseMethodSchema(schemaMap: RouterSchema) {
   return methodTypeInfo;
 }
 
+/**
+ * 将 routerInfoMap 转换为 typeInfoList
+ */
 function parseTypeInfo(routerInfoMap: Record<string, RouterInfo>) {
   const typeInfoList: MethodTypeInfo[] = [];
   for (const stringPath in routerInfoMap) {
@@ -96,11 +119,17 @@ function parseTypeInfo(routerInfoMap: Record<string, RouterInfo>) {
   return typeInfoList;
 }
 
+/**
+ * 获取请求函数的函数名
+ */
 function getMethodName(method: string, path: string) {
   const splitPath = path.split('/').filter(item => item && !item.startsWith(':'));
   return camelCase(`${method}/${splitPath.join('/')}`);
 }
 
+/**
+ * 获取请求函数的入参类型
+ */
 function getMethodOptionsType(typeInfo: TypeInfo) {
   const optionsType: string[] = [];
   for (const dataKey in typeInfo) {
@@ -115,6 +144,11 @@ interface APIInfo {
   request: string;
 }
 
+/**
+ * 将 typeInfo 解析为 api 信息
+ *
+ * 包含类型和请求方法
+ */
 function parseAPIInfo(typeInfoList: MethodTypeInfo[]) {
   const apiInfoList: APIInfo[] = [];
   typeInfoList.forEach((item) => {
@@ -132,6 +166,9 @@ function parseAPIInfo(typeInfoList: MethodTypeInfo[]) {
   return apiInfoList;
 }
 
+/**
+ * 解析 api 信息为实际代码内容
+ */
 function parseAPIContentInfo(apiInfo: APIInfo[]) {
   const { type, method } = apiInfo.reduce<{ type: string[]; method: string[] }>((prev, cur) => {
     prev.type.push(cur.type);
@@ -144,14 +181,22 @@ function parseAPIContentInfo(apiInfo: APIInfo[]) {
   };
 }
 
+/**
+ * 生成前端请求接口的代码文件
+ */
 function generateAPIFile(contentInfo: { type: string; method: string }) {
   return template.replace(API_TYPE_SYMBOL, contentInfo.type).replace(API_METHOD_SYMBOL, contentInfo.method);
 }
 
+/**
+ * 根据 router-schema 生成前端请求接口的代码文件
+ */
 export async function generateRequestScriptCli() {
+  // 禁用日志输出, 因为会载入代码收集依赖, 所以需要将 console 也进行代理, 屏蔽常用输出
   setStorage('disabledConsola', true);
   globalThis.console = new Proxy({}, { get: () => noop }) as Console;
 
+  // 初始化应用
   const { port, sourceDir } = await parseConfig();
   const { pkgPath } = await getPkgInfo();
   const devOptions = { pkgPath, sourceDir, port, isCli: true };
@@ -165,6 +210,7 @@ export async function generateRequestScriptCli() {
 
   await loadModule(app, router, options);
 
+  // 处理文件依赖信息, 生成前端请求文件
   const routerInfoMap = getStorage('routerInfoMap');
   const validRouterInfoMap = filterValidRouter(routerInfoMap);
 

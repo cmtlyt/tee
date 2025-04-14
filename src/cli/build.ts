@@ -9,6 +9,9 @@ interface BuildOptions extends BuildConfig {
   sourceDir?: string;
 }
 
+/**
+ * 解析构建参数
+ */
 async function parseOptions(options?: BuildOptions) {
   const { sourceDir, build: { outDir, ...rest } } = await parseConfig();
 
@@ -19,6 +22,9 @@ async function parseOptions(options?: BuildOptions) {
   });
 }
 
+/**
+ * 格式化入口文件信息
+ */
 function entryFormat(fileInfoMap: FileInfoMap): { in: string; out: string }[] {
   const entrys: { in: string; out: string }[] = [];
   for (const type in fileInfoMap) {
@@ -30,7 +36,12 @@ function entryFormat(fileInfoMap: FileInfoMap): { in: string; out: string }[] {
   return entrys;
 }
 
-function getFilePoints(filePath: string) {
+/**
+ * 获取单个文件的 point 信息
+ *
+ * 使用数组作为返回值, 是为了防止文件不存在返回 undefined 导致 esbuild 报错
+ */
+function getFilePoint(filePath: string) {
   const filePoints: { in: string; out: string }[] = [];
   if (existsSync(filePath)) {
     const out = basename(filePath, '.ts');
@@ -39,6 +50,9 @@ function getFilePoints(filePath: string) {
   return filePoints;
 }
 
+/**
+ * 打包代码
+ */
 export async function build(_options?: BuildOptions) {
   const options = await parseOptions(_options);
   const { outDir: outdir, clean } = options;
@@ -55,7 +69,7 @@ export async function build(_options?: BuildOptions) {
   await esbuild({
     entryPoints: [
       ...entryPoints,
-      ...getFilePoints(mainFilePath),
+      ...getFilePoint(mainFilePath),
     ],
     outdir,
     minify: true,
