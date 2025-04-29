@@ -100,6 +100,8 @@ export interface GenerateTypeOptions {
   };
 }
 
+type CopyPathItem = { from: string; to: string } | [string, string];
+
 export interface BuildConfig {
   /**
    * 构建输出目录
@@ -115,7 +117,7 @@ export interface BuildConfig {
    * 复制目录
    * @default []
    */
-  copyPath?: Array<{ source: string; target: string } | [string, string]>;
+  copyPath?: Array<CopyPathItem>;
 }
 
 export interface ModuleLoadedContext {

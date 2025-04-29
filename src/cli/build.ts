@@ -76,7 +76,7 @@ function copyPathHandler(options: BuildOptions) {
       copyHander(item[0], item[1]);
     }
     else {
-      copyHander(item.source, item.target);
+      copyHander(item.from, item.to);
     }
   });
 }
