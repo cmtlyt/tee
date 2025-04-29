@@ -111,6 +111,11 @@ export interface BuildConfig {
    * @default false
    */
   clean?: boolean;
+  /**
+   * 复制目录
+   * @default []
+   */
+  copyPath?: Array<{ source: string; target: string } | [string, string]>;
 }
 
 export interface ModuleLoadedContext {
