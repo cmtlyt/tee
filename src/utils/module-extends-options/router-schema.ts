@@ -1,6 +1,11 @@
 import type { TypeSpecificSchema } from '../../types/schema-type';
 import type { AppRouterOptions, GetExtendsOptions } from './type';
 
+/** 判断是否是对象 */
+function isObject(value: any): value is object {
+  return typeof value === 'object' && value !== null;
+}
+
 /** string 类型 schema */
 const stringType = { type: 'string' } as const;
 /** number 类型 schema */
@@ -13,8 +18,8 @@ function getArrayType(items: TypeSpecificSchema<'array'>['items'], other?: Omit<
 }
 /** 获取 object 类型 schema */
 function getObjectType<O extends TypeSpecificSchema<'object'>['properties']>(properties: O, required?: (keyof O)[], other?: Omit<TypeSpecificSchema<'object'>, 'properties' | 'required'>) {
-  if (!required && typeof properties === 'string' && properties !== null) {
-    required = Object.keys(properties as any) as any;
+  if (!required && isObject(properties)) {
+    required = Object.keys(properties) as any;
   }
   return { type: 'object', properties, required, ...other } as const;
 }
