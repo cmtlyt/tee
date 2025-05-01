@@ -51,7 +51,7 @@ function getFilePoint(filePath: string) {
   return filePoints;
 }
 
-function copyHander(source: string, target: string) {
+function copyHandler(source: string, target: string) {
   if (!source || !target)
     return;
 
@@ -73,10 +73,10 @@ function copyPathHandler(options: BuildOptions) {
 
   getArray(copyPath).forEach((item) => {
     if (isArray(item)) {
-      copyHander(item[0], item[1]);
+      copyHandler(item[0], item[1]);
     }
     else {
-      copyHander(item.from, item.to);
+      copyHandler(item.from, item.to);
     }
   });
 }
