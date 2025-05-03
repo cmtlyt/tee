@@ -40,7 +40,7 @@ export function getRouterSchemaExtendsOptions(_: AppRouterOptions) {
     transform(mod: any) {
       const result: Record<string, any> = {};
       const prefix = this.prefix;
-      for (const key in mod) {
+      for (const key of Object.keys(mod)) {
         result[`${prefix}${key}`] = mod[key];
       }
       return result;
