@@ -20,6 +20,7 @@ export * from './consola';
 export * from './get-info';
 export * from './jiti-import';
 export * from './loader';
+export * from './object';
 export * from './parse';
 
 /**

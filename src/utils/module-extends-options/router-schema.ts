@@ -1,10 +1,6 @@
 import type { TypeSpecificSchema } from '../../types/schema-type';
 import type { AppRouterOptions, GetExtendsOptions } from './type';
-
-/** 判断是否是对象 */
-function isObject(value: any): value is object {
-  return typeof value === 'object' && value !== null;
-}
+import { isObject } from '../object';
 
 /** string 类型 schema */
 const stringType = { type: 'string' } as const;
