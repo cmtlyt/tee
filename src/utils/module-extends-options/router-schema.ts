@@ -1,5 +1,6 @@
 import type { TypeSpecificSchema } from '../../types/schema-type';
 import type { AppRouterOptions, GetExtendsOptions } from './type';
+import { isObject } from '../object';
 
 /** string 类型 schema */
 const stringType = { type: 'string' } as const;
@@ -13,8 +14,8 @@ function getArrayType(items: TypeSpecificSchema<'array'>['items'], other?: Omit<
 }
 /** 获取 object 类型 schema */
 function getObjectType<O extends TypeSpecificSchema<'object'>['properties']>(properties: O, required?: (keyof O)[], other?: Omit<TypeSpecificSchema<'object'>, 'properties' | 'required'>) {
-  if (!required && typeof properties === 'string' && properties !== null) {
-    required = Object.keys(properties as any) as any;
+  if (!required && isObject(properties)) {
+    required = Object.keys(properties) as any;
   }
   return { type: 'object', properties, required, ...other } as const;
 }
@@ -39,7 +40,7 @@ export function getRouterSchemaExtendsOptions(_: AppRouterOptions) {
     transform(mod: any) {
       const result: Record<string, any> = {};
       const prefix = this.prefix;
-      for (const key in mod) {
+      for (const key of Object.keys(mod)) {
         result[`${prefix}${key}`] = mod[key];
       }
       return result;
