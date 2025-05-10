@@ -1,5 +1,6 @@
 import type { BuildConfig, FileInfoMap, ModuleType } from '../types';
-import { existsSync } from 'node:fs';
+import { cpSync, existsSync, statSync } from 'node:fs';
+import { getArray, isArray } from '@cmtlyt/base';
 import { build as esbuild } from 'esbuild';
 import { basename, resolve } from 'pathe';
 import { rimraf } from 'rimraf';
@@ -50,6 +51,36 @@ function getFilePoint(filePath: string) {
   return filePoints;
 }
 
+function copyHandler(source: string, target: string) {
+  if (!source || !target)
+    return;
+
+  if (!existsSync(source)) {
+    return;
+  }
+
+  const isDir = statSync(source).isDirectory();
+
+  cpSync(source, target, { recursive: isDir });
+}
+
+function copyPathHandler(options: BuildOptions) {
+  const { copyPath } = options;
+
+  if (!copyPath?.length) {
+    return;
+  }
+
+  getArray(copyPath).forEach((item) => {
+    if (isArray(item)) {
+      copyHandler(item[0], item[1]);
+    }
+    else {
+      copyHandler(item.from, item.to);
+    }
+  });
+}
+
 /**
  * 打包代码
  */
@@ -77,6 +108,8 @@ export async function build(_options?: BuildOptions) {
     minifySyntax: true,
     minifyWhitespace: true,
   });
+
+  copyPathHandler(options);
 
   return fileInfoMap;
 }

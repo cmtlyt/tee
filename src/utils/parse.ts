@@ -27,6 +27,7 @@ export async function parseConfig() {
     build: {
       outDir: resolve(pkgPath, 'dist'),
       clean: false,
+      copyPath: [],
     },
     generateTypeConfig: {
       customNeedReturnTypeModules: [],
@@ -37,7 +38,7 @@ export async function parseConfig() {
       },
       getInterface: () => false,
     },
-  });
+  } satisfies ConfigFile);
   setStorage('config', finishedConfig);
   return finishedConfig;
 }
