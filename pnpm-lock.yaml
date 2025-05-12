@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@cmtlyt/base':
-        specifier: ^0.11.4
-        version: 0.11.4
+        specifier: ^0.13.0
+        version: 0.13.0
       '@koa/router':
         specifier: ^13.1.0
         version: 13.1.0
@@ -175,8 +175,8 @@ packages:
   '@clack/prompts@0.10.1':
     resolution: {integrity: sha512-Q0T02vx8ZM9XSv9/Yde0jTmmBQufZhPJfYAg2XrrrxWWaZgq1rr8nU8Hv710BQ1dhoP8rtY7YUdpGej2Qza/cw==}
 
-  '@cmtlyt/base@0.11.4':
-    resolution: {integrity: sha512-5Ietug0lCggrNNtCDl73P4pBQn8hvRVgYw9Vor+fDQjUbhQI9Wj08QCXUkVOqeCnDHPWjU8dds7ha3EXSum/Vw==}
+  '@cmtlyt/base@0.13.0':
+    resolution: {integrity: sha512-yJcXwNWIewkp1km2y44yVWZkaSMLwbFXGbZbVIss6PqWUFq191Wlzvbvtrx0fHaH8/5hb7Ea8iwp/E8S9SC3lQ==}
 
   '@commitlint/cli@19.8.0':
     resolution: {integrity: sha512-t/fCrLVu+Ru01h0DtlgHZXbHV2Y8gKocTR5elDOqIRUzQd0/6hpt2VIWOj9b3NDo7y4/gfxeR2zRtXq/qO6iUg==}
@@ -3556,7 +3556,7 @@ snapshots:
       picocolors: 1.1.1
       sisteransi: 1.0.5
 
-  '@cmtlyt/base@0.11.4':
+  '@cmtlyt/base@0.13.0':
     dependencies:
       ms: 2.1.3
 
