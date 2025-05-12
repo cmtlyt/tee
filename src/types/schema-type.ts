@@ -82,7 +82,7 @@ interface BaseSchema {
 
 // 根据type字段动态选择验证属性
 export type TypeSpecificSchema<T extends JsonSchemaType> = {
-  [K in T]: ValidationMap[K];
+  [K in T]: ValidationMap[K] & BaseSchema;
 }[T];
 
 // 主类型声明

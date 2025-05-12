@@ -84,7 +84,7 @@ function parseRouterDataSchema(methodSchema: RouterDataSchema) {
   const typeInfo: TypeInfo = {};
   for (const dataKey in methodSchema) {
     const schema = getRouterDataSchema(dataKey, methodSchema)!;
-    const declaration = generateTypes(schema, { addDefaults: false, addExport: false, allowExtraKeys: true });
+    const declaration = generateTypes(schema, { addDefaults: false, addExport: false, allowExtraKeys: true, partial: true });
     typeInfo[getDataKeyName(dataKey)] = declaration.slice(declaration.indexOf('{')).replace(/\n\s*/g, ' ');
   }
   return typeInfo;
