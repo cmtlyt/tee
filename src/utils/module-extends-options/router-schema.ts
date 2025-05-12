@@ -1,6 +1,6 @@
 import type { TypeSpecificSchema } from '../../types/schema-type';
 import type { AppRouterOptions, GetExtendsOptions } from './type';
-import { isObject } from '../object';
+import { isPlainObject } from '@cmtlyt/base';
 
 /** string 类型 schema */
 const stringType = { type: 'string' } as const;
@@ -14,7 +14,7 @@ function getArrayType(items: TypeSpecificSchema<'array'>['items'], other?: Omit<
 }
 /** 获取 object 类型 schema */
 function getObjectType<O extends TypeSpecificSchema<'object'>['properties']>(properties: O, required?: (keyof O)[], other?: Omit<TypeSpecificSchema<'object'>, 'properties' | 'required'>) {
-  if (!required && isObject(properties)) {
+  if (!required && isPlainObject(properties)) {
     required = Object.keys(properties) as any;
   }
   return { type: 'object', properties, required, ...other } as const;
