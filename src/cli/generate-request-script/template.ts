@@ -16,7 +16,18 @@ interface RequestAdapter {
   options: (url: string, option: AdapterOptions) => Promise<any>;
 }
 
+function filterObject(params: Record<string, any>): Record<string, any> {
+  return Object.keys(params).reduce<Record<string, any>>((prev, cur) => {
+    const value = params[cur];
+    if (typeof value !== "undefined" && value !== null) {
+      prev[cur] = typeof value === "object" ? filterObject(value) : value;
+    }
+    return prev;
+  }, {});
+}
+
 function getPath(basePath: string, params: Record<string, string>): string {
+  params = filterObject(params);
   return basePath.replace(/\\/:(\\w+)/g, (_, key) => \`/\${params[key]}\`);
 }
 

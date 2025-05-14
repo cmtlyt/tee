@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       '@cmtlyt/base':
-        specifier: ^0.13.0
+        specifier: ~0.13.0
         version: 0.13.0
       '@koa/router':
         specifier: ^13.1.0
