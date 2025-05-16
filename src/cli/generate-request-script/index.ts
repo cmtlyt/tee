@@ -2,7 +2,7 @@ import type TeeKoa from '../..';
 import type { DataKey, RequestMethod, RouterDataSchema, RouterInfo, RouterSchema } from '../../types';
 import fs from 'node:fs';
 import path from 'node:path';
-import { noop } from '@cmtlyt/base';
+import { isNull, noop } from '@cmtlyt/base';
 import { pick_ } from '@cmtlyt/base/fp/utils';
 import KoaRouter from '@koa/router';
 import Koa from 'koa';
@@ -72,7 +72,7 @@ function getRouterParams(path: string) {
  */
 function getRouterDataSchema(dataKey: string, schema: RouterDataSchema) {
   if (dataKey === 'response') {
-    return schema.response?.['200'] || schema.response?.default || {};
+    return (schema.response && (schema.response['200'] || schema.response.default)) || {};
   }
   return schema[dataKey];
 }
@@ -84,7 +84,9 @@ function parseRouterDataSchema(methodSchema: RouterDataSchema) {
   const typeInfo: TypeInfo = {};
   for (const dataKey in methodSchema) {
     const schema = getRouterDataSchema(dataKey, methodSchema)!;
-    const declaration = generateTypes(schema, { addDefaults: false, addExport: false, allowExtraKeys: true });
+    if (isNull(schema))
+      continue;
+    const declaration = generateTypes(schema, { addDefaults: false, addExport: false, allowExtraKeys: true, partial: true });
     typeInfo[getDataKeyName(dataKey)] = declaration.slice(declaration.indexOf('{')).replace(/\n\s*/g, ' ');
   }
   return typeInfo;

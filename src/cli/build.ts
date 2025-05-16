@@ -1,5 +1,6 @@
 import type { BuildConfig, FileInfoMap, ModuleType } from '../types';
-import { existsSync } from 'node:fs';
+import { cpSync, existsSync, statSync } from 'node:fs';
+import { getArray, isArray } from '@cmtlyt/base';
 import { build as esbuild } from 'esbuild';
 import { basename, resolve } from 'pathe';
 import { rimraf } from 'rimraf';
@@ -26,14 +27,14 @@ async function parseOptions(options?: BuildOptions) {
  * 格式化入口文件信息
  */
 function entryFormat(fileInfoMap: FileInfoMap): { in: string; out: string }[] {
-  const entrys: { in: string; out: string }[] = [];
+  const entries: { in: string; out: string }[] = [];
   for (const type in fileInfoMap) {
     const fileInfos = fileInfoMap[type as ModuleType];
     for (const fileInfo of fileInfos) {
-      entrys.push({ in: fileInfo.path, out: `${fileInfo.type!}/${fileInfo.name}` });
+      entries.push({ in: fileInfo.path, out: `${fileInfo.type!}/${fileInfo.name}` });
     }
   }
-  return entrys;
+  return entries;
 }
 
 /**
@@ -48,6 +49,36 @@ function getFilePoint(filePath: string) {
     filePoints.push({ in: filePath, out });
   }
   return filePoints;
+}
+
+function copyHandler(source: string, target: string) {
+  if (!source || !target)
+    return;
+
+  if (!existsSync(source)) {
+    return;
+  }
+
+  const isDir = statSync(source).isDirectory();
+
+  cpSync(source, target, { recursive: isDir });
+}
+
+function copyPathHandler(options: BuildOptions) {
+  const { copyPath } = options;
+
+  if (!copyPath?.length) {
+    return;
+  }
+
+  getArray(copyPath).forEach((item) => {
+    if (isArray(item)) {
+      copyHandler(item[0], item[1]);
+    }
+    else {
+      copyHandler(item.from, item.to);
+    }
+  });
 }
 
 /**
@@ -77,6 +108,8 @@ export async function build(_options?: BuildOptions) {
     minifySyntax: true,
     minifyWhitespace: true,
   });
+
+  copyPathHandler(options);
 
   return fileInfoMap;
 }
