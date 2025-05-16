@@ -1,3 +1,19 @@
+# [0.6.0](https://github.com/cmtlyt/tee/compare/v0.5.1...v0.6.0) (2025-05-16)
+
+
+### Bug Fixes
+
+* 修正了错误的变量命名 ([#31](https://github.com/cmtlyt/tee/issues/31)) ([d167484](https://github.com/cmtlyt/tee/commit/d1674844ae0ac033948b96db1789d4a0f70bd48b))
+
+
+### Features
+
+* 补充schema工具 ([#26](https://github.com/cmtlyt/tee/issues/26)) ([900f389](https://github.com/cmtlyt/tee/commit/900f3899f15313babe401fbf166b4c0d2ab5b313)), closes [#29](https://github.com/cmtlyt/tee/issues/29)
+* 类型与模板优化 ([#34](https://github.com/cmtlyt/tee/issues/34)) ([f040650](https://github.com/cmtlyt/tee/commit/f040650ec0cbf160f6e489a7844ddfceb130267b))
+* build命令支持复制文件 ([#25](https://github.com/cmtlyt/tee/issues/25)) ([23db142](https://github.com/cmtlyt/tee/commit/23db14203f94ffb880f5e084842eb49c9ec254ba)), closes [#30](https://github.com/cmtlyt/tee/issues/30)
+
+
+
 ## [0.5.1](https://github.com/cmtlyt/tee/compare/v0.5.0...v0.5.1) (2025-04-08)
 
 
