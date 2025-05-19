@@ -1,5 +1,9 @@
+import type { Options as CorsOptions } from '@koa/cors';
+import type { Options as MulterOptions } from '@koa/multer';
 import type KoaRouter from '@koa/router';
 import type { Jiti } from 'jiti';
+import type { KoaBodyMiddlewareOptions } from 'koa-body';
+import type { Options as StaticOptions } from 'koa-static';
 import type { Server } from 'node:http';
 import type TeeKoa from '..';
 import type { JsonSchema } from './schema-type';
@@ -196,6 +200,13 @@ export interface GenerateTypeConfig {
   getInterface?: (moduleType: string, typeInfoMap: TypeInfo) => void | string | false | Promise<string | void | false>;
 }
 
+interface MiddlewareOptions {
+  cors?: CorsOptions | false;
+  multer?: (MulterOptions & { uploadDir?: string }) | false;
+  bodyParse?: Partial<KoaBodyMiddlewareOptions> | false;
+  static?: (StaticOptions & { dir?: string; path?: string }) | false;
+}
+
 export interface ConfigFile {
   /**
    * 启动端口
@@ -229,6 +240,10 @@ export interface ConfigFile {
    * 类型生成配置
    */
   generateTypeConfig?: GenerateTypeConfig;
+  /**
+   * 内置中间件选项
+   */
+  middlewareOptions?: MiddlewareOptions;
 }
 
 export type RouterDataSchema = Partial<{
