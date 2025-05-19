@@ -2,7 +2,7 @@ import type { TeeKoa } from '../types';
 import { getRandomString } from '@cmtlyt/base';
 import cors from '@koa/cors';
 import multer from '@koa/multer';
-import koaBody from 'koa-body';
+import { koaBody } from 'koa-body';
 import mount from 'koa-mount';
 import koaStatic from 'koa-static';
 import { getStorages } from '../storage';

@@ -23,6 +23,15 @@ importers:
       '@types/koa':
         specifier: ^2.15.0
         version: 2.15.0
+      '@types/koa-static':
+        specifier: ^4.0.4
+        version: 4.0.4
+      '@types/koa__cors':
+        specifier: ^5.0.0
+        version: 5.0.0
+      '@types/koa__multer':
+        specifier: ^2.0.7
+        version: 2.0.7
       '@types/koa__router':
         specifier: ^12.0.4
         version: 12.0.4
@@ -84,15 +93,6 @@ importers:
       '@types/koa-mount':
         specifier: ^4.0.5
         version: 4.0.5
-      '@types/koa-static':
-        specifier: ^4.0.4
-        version: 4.0.4
-      '@types/koa__cors':
-        specifier: ^5.0.0
-        version: 5.0.0
-      '@types/koa__multer':
-        specifier: ^2.0.7
-        version: 2.0.7
       conventional-changelog-cli:
         specifier: ^5.0.0
         version: 5.0.0(conventional-commits-filter@5.0.0)

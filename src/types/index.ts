@@ -200,7 +200,7 @@ export interface GenerateTypeConfig {
   getInterface?: (moduleType: string, typeInfoMap: TypeInfo) => void | string | false | Promise<string | void | false>;
 }
 
-interface MiddlewareOptions {
+export interface MiddlewareOptions {
   cors?: CorsOptions | false;
   multer?: (MulterOptions & { uploadDir?: string }) | false;
   bodyParse?: Partial<KoaBodyMiddlewareOptions> | false;
