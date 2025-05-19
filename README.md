@@ -48,6 +48,13 @@ yarn add @cmtlyt/tee
 pnpm i @cmtlyt/tee
 ```
 
+## 中间件默认配置
+
+- cors 默认空配置
+- multer 对于所有接口的文件进行代理, 存储路径为 `public/upload`, 文件名规则 `${getRandomString(8)}-${file.originalname}`
+- bodyParse 默认空配置
+- static 默认目录为 `public`, 接口路径前缀为 `/static`
+
 ## 代码示例
 
 **config**
