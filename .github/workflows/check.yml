@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: ['*']  # 触发所有目标分支的 PR
 
+permissions:
+  contents: read
+
 jobs:
   check-and-build:
     runs-on: ${{ matrix.os }}
