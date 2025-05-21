@@ -38,6 +38,17 @@ export async function parseConfig() {
       },
       getInterface: () => false,
     },
+    middlewareOptions: {
+      cors: {} as any,
+      multer: {
+        uploadDir: resolve(pkgPath, 'public', 'upload'),
+      } as any,
+      bodyParse: {} as any,
+      static: {
+        dir: resolve(pkgPath, 'public'),
+        path: '/static',
+      } as any,
+    },
   } satisfies ConfigFile);
   setStorage('config', finishedConfig);
   return finishedConfig;
