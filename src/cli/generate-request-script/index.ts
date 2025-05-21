@@ -136,6 +136,10 @@ function getMethodOptionsType(typeInfo: TypeInfo) {
   const optionsType: string[] = [];
   for (const dataKey in typeInfo) {
     const type = typeInfo[dataKey as DataKey];
+    if (dataKey === 'body') {
+      optionsType.push(`body: ${type} | FormData`);
+      continue;
+    }
     optionsType.push(`${dataKey}: ${type}`);
   }
   return `{ ${optionsType.join(', ')} }`;
@@ -158,8 +162,9 @@ function parseAPIInfo(typeInfoList: MethodTypeInfo[]) {
     for (const method in methodType) {
       const { response, ...typeInfo } = methodType[method as RequestMethod]!;
       const methodName = getMethodName(method, schemaPath);
+      const optionType = getMethodOptionsType(typeInfo);
       const apiInfo = {
-        type: `${methodName}: <T = ${response || 'unknown'}>(option: ${getMethodOptionsType(typeInfo)}) => Promise<T>`,
+        type: `${methodName}: <T = ${response || 'unknown'}>(option: ${optionType}) => Promise<T>`,
         request: `${methodName}: request(${JSON.stringify(Object.assign({ method: method.toLowerCase() }, pick_(['path', 'schemaPath', 'params'], item)))})`,
       };
       apiInfoList.push(apiInfo);

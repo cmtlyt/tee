@@ -8,6 +8,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
+    },
+    "./request-adapter": {
+      "types": "./dist/request-adapter/index.d.ts",
+      "import": "./dist/request-adapter/index.mjs",
+      "require": "./dist/request-adapter/index.cjs"
     }
   },
   "bin": {
