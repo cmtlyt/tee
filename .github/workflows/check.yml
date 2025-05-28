@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: ['*']  # 触发所有目标分支的 PR
+    types: [opened, synchronize, reopened]
 
 jobs:
   check-and-build:
