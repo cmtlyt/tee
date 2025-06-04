@@ -2,8 +2,8 @@ export const API_TYPE_SYMBOL = '#{APIType}';
 export const API_METHOD_SYMBOL = '#{APIMethod}';
 
 export const template = `interface AdapterOptions {
-  query: Record<string, any>;
-  body: any;
+  query?: Record<string, any>;
+  body?: any;
 }
 
 interface RequestAdapter {
