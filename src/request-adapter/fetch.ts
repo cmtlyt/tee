@@ -39,43 +39,61 @@ function request(option: RequestInit & { url: string | URL | Request }) {
   return fetch(url, rect);
 }
 
-function getUrl(url: string, query: AdapterOptions['query'] = {}) {
+function queryValueHandler(value: any) {
+  if (Array.isArray(value) || (typeof value === 'object' && value !== null)) {
+    return JSON.stringify(value);
+  }
+  return value == null ? String(value) : '';
+}
+
+function getUrl(url: string, query: AdapterOptions['query'] = {}): URL | string {
   if (!url.startsWith('http')) {
     url = `https://${location.host}${url}`;
   }
   const _url = new URL(url);
   Object.keys(query).forEach((key) => {
-    _url.searchParams.append(key, query[key]);
+    _url.searchParams.append(key, queryValueHandler(query[key]));
   });
   return _url;
 }
 
-function getRequestOption(url: string, option: AdapterOptions) {
+function getRequestOption(this: FetchAdapter, url: string, option: AdapterOptions) {
   const { body = null, query = {} } = option;
-  const _url = getUrl(url, query);
-  const contentType = getContentType(body);
-  const bodyContent = getBody(body, contentType);
+  // 使用 this 是为了方便用户直接改写适配器的对应方法, 但是不推荐这么做
+  const _url = this.getUrl(url, query);
+  const contentType = this.getContentType(body);
+  const bodyContent = this.getBody(body, contentType);
   const result = { url: _url, body: bodyContent };
   return result;
 }
 
 interface FetchAdapterOptions {
+  /** 基础 URL */
   baseURL?: string;
+  /** 请求前处理 */
   onRequest?: (option: RequestInit & { url: string | URL | Request }) => void;
+  /** 请求后处理 */
   onResponse?: (response: Response) => any;
 }
 
 interface FetchAdapter extends RequestAdapter {
+  /** 获取请求体格式 (可覆盖但不推荐) */
   getContentType: typeof getContentType;
+  /** 获取请求体 (可覆盖但不推荐) */
   getBody: typeof getBody;
+  /** 获取请求 URL (可覆盖但不推荐) */
   getUrl: typeof getUrl;
+  /** 获取请求选项 (可覆盖但不推荐) */
   getRequestOption: typeof getRequestOption;
+  /** 发送请求 (可覆盖但不推荐) */
   request: typeof request;
 }
 
 export function createFetchAdapter(option?: FetchAdapterOptions) {
   const methods = ['get', 'post', 'put', 'delete', 'patch', 'head', 'options'];
-  const { baseURL, onRequest, onResponse } = option || {};
+  const { baseURL } = option || {};
+  const { onRequest, onResponse } = option || {};
+  const _baseURL = baseURL?.replace(/\/$/, '') || '';
 
   return new Proxy({
     getContentType,
@@ -84,16 +102,16 @@ export function createFetchAdapter(option?: FetchAdapterOptions) {
     getRequestOption,
     request,
   } as FetchAdapter, {
-    get(target, prop: string, receiver) {
+    get(target, prop: string, receiver: FetchAdapter) {
       if (!methods.includes(prop)) {
         return Reflect.get(target, prop, receiver);
       }
       return async function (url: string, option: AdapterOptions) {
-        const requestOption = getRequestOption(`${baseURL?.replace(/\/$/, '') || ''}${url}`, option);
+        const requestOption = Reflect.apply(receiver.getRequestOption, receiver, [`${_baseURL}${url}`, option]);
         if (onRequest) {
           onRequest(requestOption);
         }
-        const response = await request({ method: prop.toUpperCase(), ...requestOption });
+        const response = await Reflect.apply(receiver.request, receiver, [{ method: prop.toUpperCase(), ...requestOption }]);
         if (onResponse) {
           return onResponse(response);
         }
