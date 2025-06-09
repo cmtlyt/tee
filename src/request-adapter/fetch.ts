@@ -43,7 +43,7 @@ function queryValueHandler(value: any) {
   if (Array.isArray(value) || (typeof value === 'object' && value !== null)) {
     return JSON.stringify(value);
   }
-  return value == null ? String(value) : '';
+  return value == null ? '' : String(value);
 }
 
 function getUrl(url: string, query: AdapterOptions['query'] = {}): URL | string {
