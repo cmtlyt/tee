@@ -89,8 +89,9 @@ interface FetchAdapter extends RequestAdapter {
   request: typeof request;
 }
 
+const methods = new Set(['get', 'post', 'put', 'delete', 'patch', 'head', 'options']);
+
 export function createFetchAdapter(option?: FetchAdapterOptions) {
-  const methods = ['get', 'post', 'put', 'delete', 'patch', 'head', 'options'];
   const { baseURL } = option || {};
   const { onRequest, onResponse } = option || {};
   const _baseURL = baseURL?.replace(/\/$/, '') || '';
@@ -103,7 +104,7 @@ export function createFetchAdapter(option?: FetchAdapterOptions) {
     request,
   } as FetchAdapter, {
     get(target, prop: string, receiver: FetchAdapter) {
-      if (!methods.includes(prop)) {
+      if (!methods.has(prop)) {
         return Reflect.get(target, prop, receiver);
       }
       return async function (url: string, option: AdapterOptions) {
