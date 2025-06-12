@@ -1,6 +1,6 @@
 {
   "name": "@cmtlyt/tee",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "支持 ts 的仿 egg 后端框架",
   "packageManager": "pnpm@10.2.0",
   "exports": {
