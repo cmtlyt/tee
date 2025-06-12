@@ -173,6 +173,38 @@ export default defineRouterSchema(({ setPrefix, getObjectType, stringType }) => 
 });
 ```
 
+**当然也可以选择用 zod 来进行输入教验证**
+
+> `src/router-schema/example-zod.ts`
+
+```ts
+import { defineRouterSchema } from '@cmtlyt/tee';
+// 也可以使用 zod 模块, tee 中对 zod 模块的部分内容进行重写, 如果使用 zod 模块的话请注意部分特性是不支持的
+import { z } from '@cmtlyt/tee/zod';
+
+export default defineRouterSchema(({ setPrefix }) => {
+  setPrefix('/example');
+  return {
+    '/name': {
+      get: {
+        // 可选查询参数
+        query: z.object({
+          id: z.string(),
+        }).partial(),
+      }
+    },
+    '/hello/:name': {
+      get: {
+        // 如果 getObjectType 不传递第二个参数则默认全部必填, 如果传递的话, 只有传递的字段为必填
+        params: z.object({
+          name: z.string(),
+        }),
+      }
+    }
+  };
+});
+```
+
 **router**
 
 > `src/router/example.ts`

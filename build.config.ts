@@ -1,44 +1,42 @@
 import { defineBuildConfig } from 'unbuild';
 
+const baseConfig = {
+  outDir: 'dist',
+  declaration: true,
+  sourcemap: false,
+  rollup: {
+    cjsBridge: true,
+    emitCJS: true,
+    esbuild: {
+      minify: true,
+    },
+  },
+  failOnWarn: false,
+} as const;
+
 export default defineBuildConfig([
   {
+    ...baseConfig,
     entries: ['src/index'],
-    outDir: 'dist',
     clean: true,
-    declaration: true,
-    sourcemap: false,
-    rollup: {
-      cjsBridge: true,
-      emitCJS: true,
-      esbuild: {
-        minify: true,
-      },
-    },
-    failOnWarn: false,
   },
   {
+    ...baseConfig,
     entries: ['src/cli'],
     outDir: 'bin',
-    sourcemap: false,
+    declaration: false,
     rollup: {
-      esbuild: {
-        minify: true,
-      },
+      ...baseConfig.rollup,
+      emitCJS: false,
     },
     failOnWarn: false,
   },
   {
+    ...baseConfig,
     entries: ['src/request-adapter/index'],
-    outDir: 'dist',
-    declaration: true,
-    sourcemap: false,
-    rollup: {
-      cjsBridge: true,
-      emitCJS: true,
-      esbuild: {
-        minify: true,
-      },
-    },
-    failOnWarn: false,
+  },
+  {
+    ...baseConfig,
+    entries: ['src/zod/index'],
   },
 ]);

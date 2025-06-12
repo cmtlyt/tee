@@ -1,5 +1,6 @@
 import type TeeKoa from '../..';
 import type { DataKey, RequestMethod, RouterDataSchema, RouterInfo, RouterSchema } from '../../types';
+import type { JsonSchema, PlainJsonSchema } from '../../types/schema-type';
 import fs from 'node:fs';
 import path from 'node:path';
 import { isNull, noop } from '@cmtlyt/base';
@@ -8,6 +9,7 @@ import KoaRouter from '@koa/router';
 import Koa from 'koa';
 import { camelCase } from 'scule';
 import { generateTypes } from 'untyped';
+import { toJSONSchema as zodToJSONSchema } from 'zod/v4';
 import { getStorage, setStorage } from '../../storage';
 import { getPkgInfo, loadModule, parseConfig, parseOptions } from '../../utils';
 import { API_METHOD_SYMBOL, API_TYPE_SYMBOL, template } from './template';
@@ -68,13 +70,40 @@ function getRouterParams(path: string) {
 }
 
 /**
+ * 处理传入的 schema 转换为 jsonSchema
+ */
+function schemaTransform(schema: JsonSchema | undefined) {
+  if (schema && '_zod' in schema) {
+    return zodToJSONSchema(schema, {
+      reused: 'inline',
+      unrepresentable: 'any',
+      io: 'input',
+      override({ zodSchema, jsonSchema }) {
+        const { def } = zodSchema._zod;
+        switch (def.type) {
+          case 'date': {
+            jsonSchema.type = 'string';
+            jsonSchema.format = 'date-time';
+          }
+        }
+      },
+    }) as PlainJsonSchema;
+  }
+  return schema;
+}
+
+/**
  * 获取 dataKey 对应的 schema
  */
 function getRouterDataSchema(dataKey: string, schema: RouterDataSchema) {
+  let result;
   if (dataKey === 'response') {
-    return (schema.response && (schema.response['200'] || schema.response.default)) || {};
+    result = (schema.response && (schema.response['200'] || schema.response.default)) || {};
   }
-  return schema[dataKey];
+  else {
+    result = schema[dataKey];
+  }
+  return schemaTransform(result);
 }
 
 /**
@@ -86,8 +115,13 @@ function parseRouterDataSchema(methodSchema: RouterDataSchema) {
     const schema = getRouterDataSchema(dataKey, methodSchema)!;
     if (isNull(schema))
       continue;
+    // TODO: 后续在 @cmtlyt/base 包中实现 generateTypes 支持更多的 jsonSchema 语法, 例如 anyOf, oneOf 等
     const declaration = generateTypes(schema, { addDefaults: false, addExport: false, allowExtraKeys: true, partial: true });
-    typeInfo[getDataKeyName(dataKey)] = declaration.slice(declaration.indexOf('{')).replace(/\n\s*/g, ' ');
+    typeInfo[getDataKeyName(dataKey)] = declaration.slice(declaration.indexOf('{'))
+      // 压缩为单行
+      .replace(/\n\s*/g, ' ')
+      // 移除注释
+      .replace(/\s*\/\*\*.*?\*\/\s*/g, ' ');
   }
   return typeInfo;
 }
