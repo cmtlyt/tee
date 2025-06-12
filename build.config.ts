@@ -27,4 +27,18 @@ export default defineBuildConfig([
     },
     failOnWarn: false,
   },
+  {
+    entries: ['src/request-adapter/index'],
+    outDir: 'dist',
+    declaration: true,
+    sourcemap: false,
+    rollup: {
+      cjsBridge: true,
+      emitCJS: true,
+      esbuild: {
+        minify: true,
+      },
+    },
+    failOnWarn: false,
+  },
 ]);
