@@ -1,3 +1,5 @@
+import type { ZodType } from 'zod/v4';
+
 type JsonSchemaType =
   | 'string'
   | 'number'
@@ -83,8 +85,7 @@ interface BaseSchema {
 // 根据type字段动态选择验证属性
 export type TypeSpecificSchema<T extends JsonSchemaType> = ValidationMap[T] & BaseSchema;
 
-// 主类型声明
-export type JsonSchema = BaseSchema & (
+export type PlainJsonSchema = (BaseSchema & (
   | { type?: never } // 不指定类型时允许所有验证属性（但实际可能需要更严格的处理）
   | { type: JsonSchemaType } & TypeSpecificSchema<JsonSchemaType> // 支持多类型时的默认行为
   | { type: 'string' } & TypeSpecificSchema<'string'>
@@ -92,4 +93,7 @@ export type JsonSchema = BaseSchema & (
   | { type: 'boolean' } & TypeSpecificSchema<'boolean'>
   | { type: 'object' } & TypeSpecificSchema<'object'>
   | { type: 'array' } & TypeSpecificSchema<'array'>
-);
+));
+
+// 主类型声明
+export type JsonSchema = PlainJsonSchema | ZodType;
