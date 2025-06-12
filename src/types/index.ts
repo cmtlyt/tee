@@ -81,11 +81,6 @@ export interface GenerateTypeOptions {
    */
   loadModuleOptions?: Partial<Record<ModuleType, LoadModuleOptions>>;
   /**
-   * 模块加载顺序
-   * @default ['config', 'extend', 'routerSchema', 'service', 'middlewares', 'controller', 'router']
-   */
-  loadModuleOrder?: (ModuleType | string)[];
-  /**
    * 模块钩子
    */
   hooks?: {
@@ -102,6 +97,7 @@ export interface GenerateTypeOptions {
      */
     onModulesLoaded?: (type: string, modules: DeepRequired<FileInfo>[]) => any;
   };
+  loadOptions?: Omit<LoadOptions, 'moduleHook'>;
 }
 
 type CopyPathItem = { from: string; to: string } | [string, string];
@@ -207,6 +203,28 @@ export interface MiddlewareOptions {
   static?: (StaticOptions & { dir?: string; path?: string }) | false;
 }
 
+export interface LoadOptions {
+  /**
+   * 需要忽略的模块
+   * @default []
+   */
+  ignoreModules?: string[];
+  /**
+   * 需要忽略的文件
+   * @default fileName => fileName.startsWith('_')
+   */
+  ignoreFile: RegExp | RegExp[] | ((fileName: string, filePath: string) => boolean);
+  /**
+   * 模块加载顺序
+   * @default ['config', 'extend', 'routerSchema', 'service', 'middlewares', 'controller', 'router']
+   */
+  loadModuleOrder?: (ModuleType | string)[];
+  /**
+   * 模块钩子
+   */
+  moduleHook?: ModuleHook;
+}
+
 export interface ConfigFile {
   /**
    * 启动端口
@@ -219,20 +237,6 @@ export interface ConfigFile {
    */
   sourceDir?: string;
   /**
-   * 需要忽略的模块
-   * @default []
-   */
-  ignoreModules?: string[];
-  /**
-   * 模块加载顺序
-   * @default ['config', 'extend', 'routerSchema', 'service', 'middlewares', 'controller', 'router']
-   */
-  loadModuleOrder?: (ModuleType | string)[];
-  /**
-   * 模块钩子
-   */
-  moduleHook?: ModuleHook;
-  /**
    * 构建配置
    */
   build?: BuildConfig;
@@ -244,6 +248,10 @@ export interface ConfigFile {
    * 内置中间件选项
    */
   middlewareOptions?: MiddlewareOptions;
+  /**
+   * 模块加载配置
+   */
+  loadOptions?: LoadOptions;
 }
 
 export type RouterDataSchema = Partial<{

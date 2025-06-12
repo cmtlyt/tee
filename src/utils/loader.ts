@@ -1,6 +1,6 @@
 import type { DeepRequired, FileInfo, GenerateTypeOptions, ModuleInfo, ModuleType, TeeKoa } from '../types';
 import KoaRouter from '@koa/router';
-import { assoc, configMerge, consola, parseConfig } from '.';
+import { assoc, configMerge, consola } from '.';
 import { MODULE_LOAD_ORDER } from '../constant';
 import { getStorage, getStorages } from '../storage';
 import { createRouterInfoMap, createRouterSchemaInfoMap } from './data-map';
@@ -14,7 +14,7 @@ import { getConfigExtendsOptions, getControllerExtendsOptions, getExtendExtendsO
  * 例如一个 router 模块加载成功后就会执行这个方法
  */
 export function getModuleLoaded(app: TeeKoa.Application, router: KoaRouter) {
-  const { moduleHook } = getStorage('config');
+  const { loadOptions: { moduleHook } } = getStorage('config');
   const { loaded } = moduleHook;
 
   return async (moduleInfo: DeepRequired<FileInfo>) => {
@@ -58,7 +58,7 @@ export function getModuleLoaded(app: TeeKoa.Application, router: KoaRouter) {
  * 获取模块的处理方法
  */
 function getModuleHandler(loadModuleOptions: GenerateTypeOptions['loadModuleOptions']) {
-  const { config: { moduleHook } } = getStorages(['config']);
+  const { config: { loadOptions: { moduleHook } } } = getStorages(['config']);
   const { parser: otherModParser } = moduleHook;
 
   return async (_type: ModuleType, mod: any): Promise<ModuleInfo> => {
@@ -108,10 +108,13 @@ function getModuleHandler(loadModuleOptions: GenerateTypeOptions['loadModuleOpti
  * 基本加载模块方法
  */
 export async function baseLoadModule(options: GenerateTypeOptions) {
-  const { loadModuleOptions, loadModuleOrder = MODULE_LOAD_ORDER, hooks = {} } = options;
+  const { loadModuleOptions, loadOptions, hooks = {} } = options;
   const { onModuleLoaded = () => {}, onModulesLoaded = () => {}, onModulesLoadBefore = () => {} } = hooks;
   const { fileInfoMap, ...other } = await getFileInfoMapAndTypeDeclarations(options);
-  const { ignoreModules } = await parseConfig();
+  const { ignoreModules: hostIgnoreModules, loadModuleOrder: hostLoadModuleOrder = MODULE_LOAD_ORDER } = loadOptions || {};
+
+  const ignoreModules = new Set(hostIgnoreModules);
+  const loadModuleOrder = new Set(hostLoadModuleOrder);
 
   const moduleHandler = getModuleHandler(loadModuleOptions || {} as Record<string, any>);
 
@@ -133,7 +136,7 @@ export async function baseLoadModule(options: GenerateTypeOptions) {
     consola.success(`${type} module load done`);
   };
 
-  for (const type of (loadModuleOrder as ModuleType[])) {
+  for (const type of (loadModuleOrder.values() as unknown as ModuleType[])) {
     const items = fileInfoMap[type];
     if (!items)
       continue;
@@ -141,7 +144,7 @@ export async function baseLoadModule(options: GenerateTypeOptions) {
   }
 
   await Promise.all(Object.keys(fileInfoMap).filter(type =>
-    !loadModuleOrder.includes(type) && !ignoreModules.includes(type),
+    !loadModuleOrder.has(type) && !ignoreModules.has(type),
   ).map(async (type) => {
     const items = fileInfoMap[type as ModuleType];
     if (!items)
