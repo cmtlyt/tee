@@ -1,3 +1,12 @@
+# [0.7.0](https://github.com/cmtlyt/tee/compare/v0.6.0...v0.7.0) (2025-06-12)
+
+
+### Features
+
+* 新增内置中间件&更新koa大版本 ([#35](https://github.com/cmtlyt/tee/issues/35)) ([ea83867](https://github.com/cmtlyt/tee/commit/ea83867412c21e7a1fb38c2b5504fa74f88541b4))
+* 新增fetchRequestAdapter ([#38](https://github.com/cmtlyt/tee/issues/38)) ([c9b9978](https://github.com/cmtlyt/tee/commit/c9b99780f61d19827deb1eb1749f30c8b3620fe8))
+
+
 # [0.6.0](https://github.com/cmtlyt/tee/compare/v0.5.1...v0.6.0) (2025-05-16)
 
 
