@@ -1,6 +1,6 @@
 import type { FileInfoMap, GenerateTypeOptions, ModuleType } from '../types';
 import fg from 'fast-glob';
-import { dirname, resolve } from 'pathe';
+import { basename, dirname, resolve } from 'pathe';
 import { resolvePackageJSON } from 'pkg-types';
 import { camelCase } from 'scule';
 import { generateTypeString } from './generate-type';
@@ -16,12 +16,15 @@ export async function getPkgInfo() {
 /**
  * 获取模块文件信息
  */
-export async function getFileInfoMap({ sourceDir = 'src' }) {
+export async function getFileInfoMap({ sourceDir = 'src', ignoreFile = (fn: string, _p: string) => fn.startsWith('_') }) {
   const { pkgPath } = await getPkgInfo();
   const srcPath = resolve(pkgPath, sourceDir);
-  const files = await fg.glob(['./**/*.{ts,js}', '!**/*.d.ts'], {
+  const files = (await fg.glob(['./**/*.{ts,js}', '!**/*.d.ts'], {
     absolute: true,
     cwd: srcPath,
+  })).filter((path) => {
+    const fileName = basename(path);
+    return !ignoreFile(fileName, path);
   });
 
   const fileInfoMap = files.reduce((fileInfo, path) => {
@@ -51,9 +54,11 @@ export async function getFileInfoMap({ sourceDir = 'src' }) {
  */
 export async function getFileInfoMapAndTypeDeclarations({
   sourceDir = 'src',
+  loadOptions,
   generateTypeFunc = generateTypeString,
 }: GenerateTypeOptions) {
-  const { fileInfoMap, ...other } = await getFileInfoMap({ sourceDir });
+  const { ignoreFile } = loadOptions || {};
+  const { fileInfoMap, ...other } = await getFileInfoMap({ sourceDir, ignoreFile: ignoreFile as any });
 
   const typeDeclarations = await generateTypeFunc(fileInfoMap);
 

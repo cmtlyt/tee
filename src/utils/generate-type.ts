@@ -22,10 +22,11 @@ export function getItemType(item: Pick<FileInfo, 'type' | 'relativePath' | 'path
  * 生成所有文件的类型信息
  */
 function generateTypeInfo(fileInfoMap: FileInfoMap) {
-  const { ignoreModules } = getStorage('config');
+  const { loadOptions: { ignoreModules: _ignoreModules } } = getStorage('config');
+  const ignoreModules = new Set(_ignoreModules);
   const typeInfo: TypeInfo = {};
   for (const type in fileInfoMap) {
-    if (ignoreModules.includes(type))
+    if (ignoreModules.has(type))
       continue;
     const fileInfos = fileInfoMap[type as ModuleType];
     fileInfos.forEach((item) => {

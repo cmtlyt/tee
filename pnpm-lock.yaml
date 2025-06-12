@@ -15,8 +15,8 @@ importers:
         specifier: ^5.0.0
         version: 5.0.0
       '@koa/multer':
-        specifier: ^3.1.0
-        version: 3.1.0(multer@1.4.5-lts.2)
+        specifier: ^4.0.0
+        version: 4.0.0(koa@3.0.0)(multer@1.4.5-lts.2)
       '@koa/router':
         specifier: ^13.1.0
         version: 13.1.0
@@ -565,10 +565,11 @@ packages:
     resolution: {integrity: sha512-x/iUDjcS90W69PryLDIMgFyV21YLTnG9zOpPXS7Bkt2b8AsY3zZsIpOLBkYr9fBcF3HbkKaER5hOBZLfpLgYNw==}
     engines: {node: '>= 14.0.0'}
 
-  '@koa/multer@3.1.0':
-    resolution: {integrity: sha512-ETf4OLpOew9XE9lyU+5HIqk3TCmdGAw9pUXgxzrlYip+PkxLGoU4meiVTxiW4B6lxdBNijb3DFQ7M2woLcDL1g==}
-    engines: {node: '>= 14'}
+  '@koa/multer@4.0.0':
+    resolution: {integrity: sha512-BY6hys3WVX1yL/gcfKWu94z1fJ6ayG1DEEw/s82DnulkaTbumwjF6XqSfNLKFcs8lnJb2QfMJ4DyK4bmF1NDZw==}
+    engines: {node: '>= 18'}
     peerDependencies:
+      koa: '>=2'
       multer: '*'
 
   '@koa/router@13.1.0':
@@ -4095,8 +4096,9 @@ snapshots:
     dependencies:
       vary: 1.1.2
 
-  '@koa/multer@3.1.0(multer@1.4.5-lts.2)':
+  '@koa/multer@4.0.0(koa@3.0.0)(multer@1.4.5-lts.2)':
     dependencies:
+      koa: 3.0.0
       multer: 1.4.5-lts.2
 
   '@koa/router@13.1.0':
