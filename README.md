@@ -57,6 +57,8 @@ pnpm i @cmtlyt/tee
 
 ## 代码示例
 
+### 后端代码
+
 **config**
 
 > `src/config/config.default.ts`
@@ -197,4 +199,36 @@ export default defineEntry((app, router) => {
 
   app.use(app.middlewares.logger);
 });
+```
+
+### 接入前端
+
+后端编写完成后可以使用 `tee generate requestScript` 命令生成前端请求代码, 然后传入请求适配器即可直接使用
+
+> 此处提前通过命令生成了前端请求代码
+>
+> `lib/api.ts`
+
+```ts
+// request.ts
+import { createFetchAdapter } from '@cmtlyt/tee/request-adapter';
+import { getAPI } from './lib/api';
+
+const adapter = createFetchAdapter({
+  baseURL: 'http://localhost:3000/api',
+  async onResponse(response) {
+    if (response.status >= 400) {
+      return Promise.reject(response);
+    }
+    return response.json().catch(() => response.text());
+  },
+});
+
+export const api = getAPI(adapter);
+
+api.getExampleName({ query: { id: '123' } })
+  .then(res => res.text())
+  .then((res) => {
+    console.log(res); // {time} example controller
+  });
 ```
