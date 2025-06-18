@@ -1,14 +1,10 @@
-import type { Options as CorsOptions } from '@koa/cors';
-import type { Options as MulterOptions } from '@koa/multer';
-import type KoaRouter from '@koa/router';
 import type { Jiti } from 'jiti';
-import type { KoaBodyMiddlewareOptions } from 'koa-body';
-import type { Options as StaticOptions } from 'koa-static';
 import type { Server } from 'node:http';
-import type TeeKoa from '..';
+import type Tee from '..';
+import type { CoreAdapter } from '../core-adapter';
 import type { JsonSchema } from './schema-type';
 
-export { TeeKoa };
+export { Tee };
 
 /**
  * 内置模块类型
@@ -124,11 +120,15 @@ export interface ModuleLoadedContext {
   /**
    * 应用实例
    */
-  app: TeeKoa.Application;
+  app: Tee.Application;
   /**
    * 路由实例
    */
-  router: KoaRouter;
+  router: Tee.TeeRouter;
+  /**
+   * 模块
+   */
+  modules: Tee.TeeModules;
   /**
    * 模块信息
    */
@@ -147,11 +147,11 @@ export interface ModuleHandlerContext {
   /**
    * 应用实例
    */
-  app: TeeKoa.Application;
+  app: Tee.Application;
   /**
    * 路由实例
    */
-  router: KoaRouter;
+  router: Tee.TeeRouter;
 }
 
 export interface ModuleHook {
@@ -196,13 +196,6 @@ export interface GenerateTypeConfig {
   getInterface?: (moduleType: string, typeInfoMap: TypeInfo) => void | string | false | Promise<string | void | false>;
 }
 
-export interface MiddlewareOptions {
-  cors?: CorsOptions | false;
-  multer?: (MulterOptions & { uploadDir?: string }) | false;
-  bodyParse?: Partial<KoaBodyMiddlewareOptions> | false;
-  static?: (StaticOptions & { dir?: string; path?: string }) | false;
-}
-
 export interface LoadOptions {
   /**
    * 需要忽略的模块
@@ -227,6 +220,10 @@ export interface LoadOptions {
 
 export interface ConfigFile {
   /**
+   * 核心适配器
+   */
+  adapter?: CoreAdapter;
+  /**
    * 启动端口
    * @default 3000
    */
@@ -247,7 +244,7 @@ export interface ConfigFile {
   /**
    * 内置中间件选项
    */
-  middlewareOptions?: MiddlewareOptions;
+  middlewareOptions?: Tee.MidOpts;
   /**
    * 模块加载配置
    */
@@ -276,11 +273,15 @@ export interface Storage {
   /**
    * 应用实例
    */
-  app: TeeKoa.Application;
+  app: Tee.Application;
   /**
    * 路由实例
    */
-  router: KoaRouter;
+  router: Tee.TeeRouter;
+  /**
+   * 模块
+   */
+  modules: Tee.TeeModules;
   /**
    * 配置
    */
@@ -334,9 +335,7 @@ export interface DevOptions {
   isCli: boolean;
 }
 
-export type TeeOptions<T extends string> = TeeKoa.SetupOptionMap[T];
-
-export type TeeMiddlewareCtx = Parameters<TeeKoa.Application['middleware'][number]>[0];
+export type TeeOptions<T extends string> = Tee.SetupOptionMap[T];
 
 export type DataKey = 'params' | 'query' | 'body';
 

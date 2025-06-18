@@ -5,6 +5,7 @@ import { version } from '../package.json';
 import { bootstrapCli } from './cli/bootstrap';
 import { build as buildApp } from './cli/build';
 import { generateRequestScriptCli } from './cli/generate-request-script';
+import { initCli } from './cli/init';
 import { runProd } from './cli/run-prod';
 
 /** dev 命令 */
@@ -60,6 +61,16 @@ const generate = defineCommand({
   subCommands: { requestScript },
 });
 
+const init = defineCommand({
+  meta: {
+    name: 'init',
+    description: 'Initialize project',
+  },
+  async run() {
+    await initCli();
+  },
+});
+
 /** tee 命令主入口 */
 const main = defineCommand({
   meta: {
@@ -67,7 +78,14 @@ const main = defineCommand({
     version,
     description: '@cmtlyt/tee cli',
   },
-  subCommands: { dev, build, run, generate, g: generate },
+  subCommands: {
+    init,
+    dev,
+    build,
+    run,
+    generate,
+    g: generate,
+  },
 });
 
 runMain(main);

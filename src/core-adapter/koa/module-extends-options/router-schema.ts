@@ -1,4 +1,4 @@
-import type { TypeSpecificSchema } from '../../types/schema-type';
+import type { TypeSpecificSchema } from '../../../types/schema-type';
 import type { AppRouterOptions, GetExtendsOptions } from './type';
 import { isPlainObject } from '@cmtlyt/base';
 

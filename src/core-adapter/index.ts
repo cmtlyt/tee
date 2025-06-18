@@ -1,2 +1,2 @@
 export * from './base-types';
-export * from './koa';
+export { getCoreUtils } from './register-center';
