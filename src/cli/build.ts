@@ -31,7 +31,8 @@ function entryFormat(fileInfoMap: FileInfoMap): { in: string; out: string }[] {
   for (const type in fileInfoMap) {
     const fileInfos = fileInfoMap[type as ModuleType];
     for (const fileInfo of fileInfos) {
-      entries.push({ in: fileInfo.path, out: `${fileInfo.type!}/${fileInfo.name}` });
+      const target = fileInfo.relativePath.split('.').slice(0, -1).join('.');
+      entries.push({ in: fileInfo.path, out: target });
     }
   }
   return entries;
@@ -92,7 +93,7 @@ export async function build(_options?: BuildOptions) {
     await rimraf(outdir);
   }
 
-  const { fileInfoMap } = await getFileInfoMap(options);
+  const { fileInfoMap } = await getFileInfoMap({ ...options, ignoreFile: () => false });
   const entryPoints = entryFormat(fileInfoMap);
   const { pkgPath } = await getPkgInfo();
   const mainFilePath = resolve(pkgPath, 'main.ts');
