@@ -218,6 +218,28 @@ export interface LoadOptions {
   moduleHook?: ModuleHook;
 }
 
+export interface LoadOptions {
+  /**
+   * 需要忽略的模块
+   * @default []
+   */
+  ignoreModules?: string[];
+  /**
+   * 需要忽略的文件
+   * @default fileName => fileName.startsWith('_')
+   */
+  ignoreFile: RegExp | RegExp[] | ((fileName: string, filePath: string) => boolean);
+  /**
+   * 模块加载顺序
+   * @default ['config', 'extend', 'routerSchema', 'service', 'middlewares', 'controller', 'router']
+   */
+  loadModuleOrder?: (ModuleType | string)[];
+  /**
+   * 模块钩子
+   */
+  moduleHook?: ModuleHook;
+}
+
 export interface ConfigFile {
   /**
    * 核心适配器
