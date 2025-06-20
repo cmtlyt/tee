@@ -1,5 +1,4 @@
-import type KoaRouter from '@koa/router';
-import type { DeepRequired, FileInfo } from '../types';
+import type { DeepRequired, FileInfo, Tee } from '../types';
 import { getStorage } from '../storage';
 
 /**
@@ -26,15 +25,16 @@ export function createRouterSchemaInfoMap(moduleInfo: DeepRequired<FileInfo>) {
 export function createRouterInfoMap(moduleInfo: DeepRequired<FileInfo>) {
   const { moduleInfo: { content: module }, path } = moduleInfo;
 
+  const { adapter } = getStorage('config');
   const routerInfoMap = getStorage('routerInfoMap', {});
 
-  const router = module as KoaRouter;
+  const router = module as Tee.TeeRouter;
 
-  router.stack.forEach((item) => {
-    routerInfoMap[String(item.path)] = {
-      ...routerInfoMap[String(item.path)],
+  adapter.router.getRoutesPaths(router).forEach((_path) => {
+    routerInfoMap[String(_path)] = {
+      ...routerInfoMap[String(_path)],
       filePath: path,
-      path: item.path,
+      path: _path,
     };
   });
 }

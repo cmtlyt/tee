@@ -1,6 +1,7 @@
-import type { RouterSchema, TeeMiddlewareCtx } from '../../types';
+import type { RouterSchema } from '../../../types';
+import type { TeeMiddlewareCtx } from '../types';
 import type { AppRouterOptions, GetExtendsOptions } from './type';
-import { getStorage } from '../../storage';
+import { getStorage } from '../../../storage';
 
 /**
  * middleware 模块加载时的额外入参, 用于提供辅助方法等
