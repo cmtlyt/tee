@@ -1,3 +1,10 @@
+# [0.7.0](https://github.com/cmtlyt/tee/compare/v0.8.0...v0.8.0) (2025-06-20)
+
+### Features
+
+* 新增zod支持 ([#43](https://github.com/cmtlyt/tee/pull/43))
+* 新增loadOptions&调整数据结构 ([#44](https://github.com/cmtlyt/tee/pull/44))
+
 # [0.7.0](https://github.com/cmtlyt/tee/compare/v0.6.0...v0.7.0) (2025-06-12)
 
 
