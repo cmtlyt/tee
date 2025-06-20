@@ -18,6 +18,11 @@
       "types": "./dist/zod/index.d.ts",
       "import": "./dist/zod/index.mjs",
       "require": "./dist/zod/index.cjs"
+    },
+    "./koa": {
+      "types": "./dist/core-adapter/koa/index.d.ts",
+      "import": "./dist/core-adapter/koa/index.mjs",
+      "require": "./dist/core-adapter/koa/index.cjs"
     }
   },
   "bin": {

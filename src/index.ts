@@ -1,20 +1,26 @@
-import type KoaRouter from '@koa/router';
-import type Koa from 'koa';
-import type { ConfigExtendsOptions, ControllerExtendsOptions, ExtendExtendsOptions, MiddlewareExtendsOptions, RouterExtendsOptions, RouterSchemaExtendsOptions, ServiceExtendsOptions } from './utils/module-extends-options';
+/* eslint-disable ts/consistent-type-definitions */
+import type { ConfigFile } from './types';
 
 export * from './cli/bootstrap';
 export * from './cli/build';
 export * from './cli/run-prod';
 export * from './constant';
 export * from './define';
+export type { TeeOptions } from './types';
 
-export type { TeeMiddlewareCtx, TeeOptions } from './types';
+/**
+ * 定义一个 tee 配置
+ */
+export function defineTeeConfig(config: ConfigFile): ConfigFile {
+  return config;
+}
+
 export { getEnv } from './utils';
 
 export type { Defu as MergeConfig } from 'defu';
 
 // eslint-disable-next-line ts/no-namespace
-declare namespace TeeKoa {
+declare namespace Tee {
   interface IController {}
   interface IExtend {}
   interface IMiddlewares {}
@@ -23,40 +29,53 @@ declare namespace TeeKoa {
 
   interface IComputedConfig {}
 
-  interface Context extends Koa.DefaultContext {
+  type TeeModules = {
+    extend: IExtend;
     config: IComputedConfig;
-  }
-
-  interface Application extends Koa<Koa.DefaultState, Context>, IExtend {
     middlewares: IMiddlewares;
     controller: IController;
     service: IService;
     routerSchema: IRouterSchema;
-  }
+  };
 
-  interface AppOptions {
+  interface AT {
+    [key: string]: Record<string, any>;
+  }
+  type AdapterType<T extends string> = AT[T];
+
+  type Application = AdapterType<'Application'> & {};
+  type TeeRouter = AdapterType<'TeeRouter'> & {};
+  type Middleware = AdapterType<'Middleware'> & {};
+
+  type ModuleOptions = {
+    modules: TeeModules;
+  };
+
+  type AppOptions = ModuleOptions & {
     app: Application;
-  }
+  };
 
-  interface RouterOptions {
-    router: KoaRouter;
+  type RouterOptions = {
+    router: TeeRouter;
+  };
+
+  interface MEO {
+    [key: string]: Record<string, any>;
   }
 
   interface SetupOptionMap {
-    config: AppOptions & ConfigExtendsOptions;
-    controller: AppOptions & ControllerExtendsOptions;
-    extend: AppOptions & ExtendExtendsOptions;
-    middleware: AppOptions & RouterOptions & MiddlewareExtendsOptions;
-    router: AppOptions & RouterOptions & RouterExtendsOptions;
-    routerSchema: AppOptions & RouterSchemaExtendsOptions;
-    service: AppOptions & ServiceExtendsOptions;
+    config: AppOptions & MEO['config'];
+    controller: AppOptions & MEO['controller'];
+    extend: AppOptions & MEO['extend'];
+    middleware: AppOptions & RouterOptions & MEO['middleware'];
+    router: AppOptions & RouterOptions & MEO['router'];
+    routerSchema: AppOptions & MEO['routerSchema'];
+    service: AppOptions & MEO['service'];
 
-    [key: string]: {
-      app: Application;
-    };
+    [key: string]: AppOptions;
   }
 
-  interface Middleware extends Koa.Middleware<Koa.DefaultState, Context> {}
+  interface MidOpts {}
 }
 
-export default TeeKoa;
+export default Tee;

@@ -18,3 +18,8 @@ export const NEED_RETURN_TYPES = ['config', 'extend', 'routerSchema', 'service',
  * 模块加载顺序
  */
 export const MODULE_LOAD_ORDER: ModuleType[] = ['config', 'extend', 'routerSchema', 'service', 'middlewares', 'controller', 'router'];
+
+/**
+ * 内置模块
+ */
+export const BUILT_IN_MODULES = ['config', 'extend', 'routerSchema', 'service', 'middlewares', 'controller', 'router'];

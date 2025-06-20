@@ -1,7 +1,5 @@
-import type { DevOptions, GenerateTypeOptions, TeeKoa } from '../types';
+import type { DevOptions, GenerateTypeOptions } from '../types';
 import fs from 'node:fs';
-import KoaRouter from '@koa/router';
-import Koa from 'koa';
 import { resolve } from 'pathe';
 import { getStorage, setStorage } from '../storage';
 import { consola, getPkgInfo, loadModule, parseConfig, parseOptions, runSourceMain } from '../utils';
@@ -11,23 +9,22 @@ import { consola, getPkgInfo, loadModule, parseConfig, parseOptions, runSourceMa
  */
 export async function bootstrap(_options?: GenerateTypeOptions) {
   const options = await parseOptions(_options);
+  const { adapter } = getStorage('config');
 
-  const app = new Koa() as TeeKoa.Application;
-  const router = new KoaRouter();
+  const app = adapter.app.getInstance(true);
+  const router = adapter.router.getInstance(true);
 
   setStorage('app', app);
   setStorage('router', router);
 
   const { typeDeclarations, sourcePath } = await loadModule(app, router, options);
 
-  app.middlewares ||= {};
-
   const devOptions = getStorage('devOptions');
   if (devOptions?.isCli) {
     await runSourceMain(devOptions);
   }
 
-  app.use(router.routes()).use(router.allowedMethods());
+  adapter.app.use(router.routes()).use(router.allowedMethods());
 
   if (!getStorage('isProd', false)) {
     fs.writeFileSync(resolve(sourcePath, 'module.d.ts'), typeDeclarations, 'utf-8');
@@ -54,10 +51,11 @@ function errorHandler(e: Error) {
 async function restart(options: DevOptions) {
   try {
     const oldServer = getStorage('server');
+    const { adapter } = getStorage('config');
     oldServer.closeAllConnections();
     oldServer.close();
     const { app, router } = await bootstrap();
-    setStorage('server', app.listen(options.port));
+    setStorage('server', adapter.app.listen(options.port));
     return { app, router };
   }
   catch (e: any) {
@@ -94,13 +92,13 @@ async function devHandler(options: DevOptions) {
  * 命令行初始化应用的函数, 进行一些前后置处理
  */
 export async function bootstrapCli() {
-  const { port, sourceDir } = await parseConfig();
+  const { adapter, port, sourceDir } = await parseConfig();
   const { pkgPath } = await getPkgInfo();
   const devOptions = { pkgPath, sourceDir, port, isCli: true };
   setStorage('devOptions', devOptions);
-  const { app } = await bootstrap();
+  await bootstrap();
   await devHandler(devOptions);
-  setStorage('server', app.listen(port, () => {
+  setStorage('server', adapter.app.listen(port, () => {
     consola.box('live server', `http://localhost:${port}`);
   }));
 }
