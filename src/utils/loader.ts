@@ -1,54 +1,47 @@
-import type { DeepRequired, FileInfo, GenerateTypeOptions, ModuleInfo, ModuleType, TeeKoa } from '../types';
-import KoaRouter from '@koa/router';
-import { assoc, configMerge, consola } from '.';
+import type { DeepRequired, FileInfo, GenerateTypeOptions, ModuleInfo, ModuleType, Tee } from '../types';
+import { noop } from '@cmtlyt/base';
+import { assoc, configMerge, consola, createRouterInfoMap, createRouterSchemaInfoMap, getFileInfoMapAndTypeDeclarations, jitiImport } from '.';
 import { MODULE_LOAD_ORDER } from '../constant';
-import { getStorage, getStorages } from '../storage';
-import { createRouterInfoMap, createRouterSchemaInfoMap } from './data-map';
-import { getFileInfoMapAndTypeDeclarations } from './get-info';
-import { jitiImport } from './jiti-import';
-import { getConfigExtendsOptions, getControllerExtendsOptions, getExtendExtendsOptions, getMiddlewareExtendsOptions, getRouterExtendsOptions, getRouterSchemaExtendsOptions, getServiceExtendsOptions } from './module-extends-options';
+import { getCoreUtils } from '../core-adapter';
+import { getStorage, getStorages, setStorage } from '../storage';
 
 /**
  * 获取单个模块加载结束后的方法
  *
  * 例如一个 router 模块加载成功后就会执行这个方法
  */
-export function getModuleLoaded(app: TeeKoa.Application, router: KoaRouter) {
-  const { loadOptions: { moduleHook } } = getStorage('config');
+export function getModuleLoaded(app: Tee.Application, router: Tee.TeeRouter) {
+  const { adapter, loadOptions: { moduleHook } } = getStorage('config');
+  const { modules } = getStorages(['modules']);
   const { loaded } = moduleHook;
 
   return async (moduleInfo: DeepRequired<FileInfo>) => {
-    const { type: _type, moduleInfo: { content: module }, nameSep, name } = moduleInfo;
-    const result = await loaded({ app, router, moduleInfo });
+    const { type: mtype, moduleInfo: { content: module }, nameSep } = moduleInfo;
+    const result = await loaded({ app, router, modules, moduleInfo });
     if (result)
       return;
-    switch (_type) {
+    switch (mtype) {
       case 'router':{
         createRouterInfoMap(moduleInfo);
         // 合并所有子路由到主路由中
-        router.use(module.routes(), module.allowedMethods());
+        adapter.router.registerRoutes(router, module);
         return;
+      }
+      case 'routerSchema':{
+        createRouterSchemaInfoMap(moduleInfo);
+        return assoc([mtype, ...nameSep], module, modules);
       }
       case 'config':
       case 'controller':
       case 'service':
-        // 树状对象
-        return assoc([_type, ...nameSep], module, app);
       case 'extend':
-        // 添加到上下文对象
-        return (app as any)[name] = module;
-      case 'routerSchema':{
-        createRouterSchemaInfoMap(moduleInfo);
-        return assoc([_type, ...nameSep], module, app);
-      }
       case 'middlewares':{
-        const target = app.middlewares ||= {};
-        // 扁平对象
-        return Object.assign(target, { [name]: module });
+        // 树状对象
+        return assoc([mtype, ...nameSep], module, modules);
       }
       default:{
-        _type satisfies never;
-        consola.warn('unknown type:', _type);
+        mtype satisfies never;
+        consola.warn('unknown type:', mtype);
       }
     }
   };
@@ -61,15 +54,15 @@ function getModuleHandler(loadModuleOptions: GenerateTypeOptions['loadModuleOpti
   const { config: { loadOptions: { moduleHook } } } = getStorages(['config']);
   const { parser: otherModParser } = moduleHook;
 
-  return async (_type: ModuleType, mod: any): Promise<ModuleInfo> => {
-    const { parser, getOptions, ..._options } = loadModuleOptions?.[_type] || {};
-    const { transform = (mod: any) => mod, ...options } = getOptions?.(_type, mod, _options) || _options;
+  return async (mtype: ModuleType, mod: any): Promise<ModuleInfo> => {
+    const { parser, getOptions, ..._options } = loadModuleOptions?.[mtype] || {};
+    const { transform = (mod: any) => mod, ...options } = getOptions?.(mtype, mod, _options) || _options;
     if (parser) {
       const result = parser(mod, options);
       if (typeof result !== 'undefined')
         return result;
     }
-    switch (_type) {
+    switch (mtype) {
       case 'controller':
       case 'service':{
         const Mod = await transform(await mod(options));
@@ -93,11 +86,11 @@ function getModuleHandler(loadModuleOptions: GenerateTypeOptions['loadModuleOpti
         return { ...options, content: await transform(options.router) };
       }
       default: {
-        const otherOptions = { type: _type, mod, ...options };
+        const otherOptions = { type: mtype, mod, ...options };
         const result = await otherModParser(otherOptions);
         if (typeof result !== 'undefined')
           return { ...otherOptions, content: result };
-        _type satisfies never;
+        mtype satisfies never;
       }
         return { content: undefined };
     }
@@ -108,8 +101,8 @@ function getModuleHandler(loadModuleOptions: GenerateTypeOptions['loadModuleOpti
  * 基本加载模块方法
  */
 export async function baseLoadModule(options: GenerateTypeOptions) {
-  const { loadModuleOptions, loadOptions, hooks = {} } = options;
-  const { onModuleLoaded = () => {}, onModulesLoaded = () => {}, onModulesLoadBefore = () => {} } = hooks;
+  const { loadModuleOptions, loadOptions, hooks } = options;
+  const { onModuleLoaded = noop, onModulesLoaded = noop, onModulesLoadBefore = noop } = hooks || {};
   const { fileInfoMap, ...other } = await getFileInfoMapAndTypeDeclarations(options);
   const { ignoreModules: hostIgnoreModules, loadModuleOrder: hostLoadModuleOrder = MODULE_LOAD_ORDER } = loadOptions || {};
 
@@ -156,52 +149,33 @@ export async function baseLoadModule(options: GenerateTypeOptions) {
 }
 
 /**
- * 获取每个模块加载时需要的入参
- */
-function getLoadModuleOptions(app: TeeKoa.Application, router: KoaRouter) {
-  const appRouterOptions = { app, router };
-  return {
-    config: { app, ...getConfigExtendsOptions(appRouterOptions) },
-    controller: { app, ...getControllerExtendsOptions(appRouterOptions) },
-    extend: { app, ...getExtendExtendsOptions(appRouterOptions) },
-    middlewares: { app, router, ...getMiddlewareExtendsOptions(appRouterOptions) },
-    router: { getOptions: () => {
-      const localRouter = new KoaRouter();
-      return {
-        app,
-        router: localRouter,
-        ...getRouterExtendsOptions({
-          ...appRouterOptions,
-          router: localRouter,
-          globalRouter: router,
-        }),
-      };
-    } },
-    routerSchema: { getOptions: () => ({ app, ...getRouterSchemaExtendsOptions(appRouterOptions) }) },
-    service: { app, ...getServiceExtendsOptions(appRouterOptions) },
-  };
-}
-
-/**
  * 默认配置的模块加载方法
  */
-export async function loadModule(app: TeeKoa.Application, router: KoaRouter, options?: GenerateTypeOptions) {
+export async function loadModule(app: Tee.Application, router: Tee.TeeRouter, options?: GenerateTypeOptions) {
+  const { config } = getStorages(['config']);
+  const { adapter } = config!;
+  const coreUtils = getCoreUtils(adapter);
+  const teeModules = {} as Tee.TeeModules;
+  setStorage('modules', teeModules);
+
+  const loadModuleOptions = coreUtils.getLoadModuleOptions(app, router);
+
   let configType = '';
+
   const { typeDeclarations, ...rest } = await baseLoadModule({
-    loadModuleOptions: getLoadModuleOptions(app, router),
+    loadModuleOptions,
     hooks: {
       onModulesLoaded(type, modules) {
         if (type === 'config') {
-          const { config, configTypeDeclarations } = configMerge(app, modules);
+          const { config, configTypeDeclarations } = configMerge(modules);
           configType = configTypeDeclarations;
-          app.context.config = config;
-          // @ts-expect-error any
-          delete app.config;
+          teeModules.config = config;
         }
       },
       onModuleLoaded: getModuleLoaded(app, router),
     },
     ...(options || {}),
   });
+
   return { ...rest, typeDeclarations: typeDeclarations.replace('#{configType}', configType) };
 }

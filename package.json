@@ -1,6 +1,6 @@
 {
   "name": "@cmtlyt/tee",
-  "version": "0.8.0",
+  "version": "0.9.0-alpha.0",
   "description": "支持 ts 的仿 egg 后端框架",
   "packageManager": "pnpm@10.2.0",
   "exports": {
@@ -18,6 +18,11 @@
       "types": "./dist/zod/index.d.ts",
       "import": "./dist/zod/index.mjs",
       "require": "./dist/zod/index.cjs"
+    },
+    "./koa": {
+      "types": "./dist/core-adapter/koa/index.d.ts",
+      "import": "./dist/core-adapter/koa/index.mjs",
+      "require": "./dist/core-adapter/koa/index.cjs"
     }
   },
   "bin": {

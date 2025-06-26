@@ -1,12 +1,9 @@
-import type TeeKoa from '../..';
 import type { DataKey, RequestMethod, RouterDataSchema, RouterInfo, RouterSchema } from '../../types';
 import type { JsonSchema, PlainJsonSchema } from '../../types/schema-type';
 import fs from 'node:fs';
 import path from 'node:path';
 import { isNull, noop } from '@cmtlyt/base';
 import { pick_ } from '@cmtlyt/base/fp/utils';
-import KoaRouter from '@koa/router';
-import Koa from 'koa';
 import { camelCase } from 'scule';
 import { generateTypes } from 'untyped';
 import { toJSONSchema as zodToJSONSchema } from 'zod/v4';
@@ -231,6 +228,8 @@ function generateAPIFile(contentInfo: { type: string; method: string }) {
 
 /**
  * 根据 router-schema 生成前端请求接口的代码文件
+ *
+ * TODO: 优化逻辑, 请求代码只需要根据 router 和 routerSchema 模块即可生成
  */
 export async function generateRequestScriptCli() {
   // 禁用日志输出, 因为会载入代码收集依赖, 所以需要将 console 也进行代理, 屏蔽常用输出
@@ -238,13 +237,13 @@ export async function generateRequestScriptCli() {
   globalThis.console = new Proxy({}, { get: () => noop }) as Console;
 
   // 初始化应用
-  const { port, sourceDir } = await parseConfig();
+  const { adapter } = await parseConfig();
   const { pkgPath } = await getPkgInfo();
-  const devOptions = { pkgPath, sourceDir, port, isCli: true };
-  const options = await parseOptions(devOptions);
 
-  const app = new Koa() as TeeKoa.Application;
-  const router = new KoaRouter();
+  const options = await parseOptions();
+
+  const app = adapter.app.getInstance();
+  const router = adapter.router.getInstance();
 
   setStorage('app', app);
   setStorage('router', router);

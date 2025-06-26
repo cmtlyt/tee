@@ -1,21 +1,22 @@
-import type { TeeKoa } from '../types';
+import type { DeepRequired } from '../../types';
+import type { Application, KoaMiddlewareOptions } from './types';
 import { getRandomString } from '@cmtlyt/base';
 import cors from '@koa/cors';
 import multer from '@koa/multer';
 import { koaBody } from 'koa-body';
 import mount from 'koa-mount';
 import koaStatic from 'koa-static';
-import { getStorages } from '../storage';
+import { getStorage } from '../../storage';
 
-export function initBuiltInMiddleware(app: TeeKoa.Application) {
-  const { config } = getStorages(['config']);
-  const { middlewareOptions } = config;
+export function initBuiltInMiddleware(app: Application) {
+  const { middlewareOptions } = getStorage('config');
+
   const {
     cors: corsOptions,
     multer: multerOptions,
     bodyParse: bodyParseOptions,
     static: staticOptions,
-  } = middlewareOptions;
+  } = middlewareOptions as DeepRequired<KoaMiddlewareOptions>;
 
   if (corsOptions) {
     app.use(cors(corsOptions));

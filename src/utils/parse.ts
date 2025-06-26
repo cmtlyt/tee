@@ -3,6 +3,7 @@ import { getArray, isArray, isFunc } from '@cmtlyt/base';
 import { resolve } from 'pathe';
 import { defu } from '.';
 import { MODULE_LOAD_ORDER } from '../constant';
+import { createKoaAdapter } from '../core-adapter/koa';
 import { getStorage, hasStorage, setStorage } from '../storage';
 import { getPkgInfo } from './get-info';
 import { jitiImport } from './jiti-import';
@@ -22,6 +23,9 @@ function transformConfig(config: DeepRequired<ConfigFile>) {
       return _ignoreFile.some((reg: RegExp) => reg.test(fileName));
     };
   }
+  if (!config.adapter) {
+    config.adapter = createKoaAdapter();
+  }
   return config as any;
 }
 
@@ -34,7 +38,8 @@ export async function parseConfig() {
   const { pkgPath } = await getPkgInfo();
   const configPath = resolve(pkgPath, 'tee.config.ts');
   const config: ConfigFile = await jitiImport(configPath, true).then(mod => mod.default, () => ({}));
-  const tempConfig = defu(config, {
+  const tempConfig: DeepRequired<ConfigFile> = defu(config, {
+    adapter: null as any,
     port: 3000,
     sourceDir: resolve(pkgPath, 'src'),
     build: {

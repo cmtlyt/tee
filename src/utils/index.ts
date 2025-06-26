@@ -13,6 +13,7 @@ export const defu = createDefu((object, key, value) => {
 
 export * from './config';
 export * from './consola';
+export * from './data-map';
 export * from './get-info';
 export * from './jiti-import';
 export * from './loader';

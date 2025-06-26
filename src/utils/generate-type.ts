@@ -89,6 +89,20 @@ function generateType(typeInfoMap: TypeInfo, indent = 0) {
 //   return `interface IRouterSchema extends ${allExtendsTypes.join(', ')}, Record<string, any> {}`;
 // }
 
+function getBaseType(name: string, typeContent: string, userTypeContent: string[], routerSchemaTypeContent: string) {
+  return `import type { MergeConfig } from '${name}';
+#{extendsImport}
+export {};
+
+declare module '${name}' {
+${typeContent}
+  ${userTypeContent.join('\n')}
+  ${routerSchemaTypeContent}
+  #{configType}
+  #{extendsType}
+}`;
+}
+
 /**
  * 解析文件信息并生成类型字符串
  */
@@ -112,7 +126,7 @@ export async function generateTypeString(fileInfo: FileInfoMap) {
 
   const typeContent = generateType(typeInfoMap);
 
-  let computedType = `import { MergeConfig } from '${name}';\n#{extendsImport}\nexport {};\ndeclare module '${name}' {\n${typeContent}\n  ${userTypeContent.join('\n')}\n  ${routerSchemaTypeContent}\n  #{configType}\n  #{extendsType}\n}`;
+  let computedType = getBaseType(name!, typeContent, userTypeContent, routerSchemaTypeContent);
 
   if (extendsInfo) {
     const { importContent, typeContent } = extendsInfo;
@@ -127,4 +141,20 @@ export async function generateTypeString(fileInfo: FileInfoMap) {
   }
 
   return computedType;
+}
+
+export async function generateCoverType() {
+  const { name = '@cmtlyt/tee' } = await readPackageJSON(import.meta.url);
+  const { adapter } = getStorage('config', {} as any);
+  const { name: aname = 'koa' } = adapter || {};
+  return `import type { AdapterTypes, MiddlewareOptions, ModuleExtendsOptions } from '${name}/${aname}';
+
+export {};
+
+declare module "@cmtlyt/tee" {
+  interface MEO extends ModuleExtendsOptions {}
+  interface AT extends AdapterTypes {}
+  interface MidOpts extends MiddlewareOptions {}
+}
+`;
 }

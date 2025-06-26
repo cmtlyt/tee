@@ -1,6 +1,8 @@
 import type { Storage } from '../types';
 
-const storage = {} as Storage;
+const globalStorageKey = '@cmtlyt/tee:global-storage';
+// @ts-expect-error any
+const storage = globalThis[globalStorageKey] ||= {} as Storage;
 
 /**
  * 设置存储值
@@ -20,7 +22,8 @@ export function hasStorage<K extends keyof Storage>(key: K) {
  * 获取对应键的存储值, 如果不存在则使用初始值, 如果未传递初始值则直接报错, 保证 key 对应的值一定存在
  */
 export function getStorage<K extends keyof Storage>(key: K, initialValue?: Storage[K]): Storage[K] {
-  const result = storage[key];
+  // @ts-expect-error any
+  const result = storage[key] || globalThis[globalStorageKey][key];
   if (typeof result === 'undefined') {
     if (typeof initialValue !== 'undefined') {
       setStorage(key, initialValue);
